@@ -331,7 +331,8 @@ class BloXorUI {
       row.type = 'button';
       const mark = ld.beaten ? 'X' : ld.opened ? '\u25cf' : ' ';
       const score = ld.beaten ? String(ld.score) : '---';
-      row.textContent = mark + '  ' + (i + 1) + '  ' + ld.name + '   ' + score;
+      const name = ld.opened ? ld.name : '???';
+      row.textContent = mark + '  ' + (i + 1) + '  ' + name + '   ' + score;
       row.addEventListener('click', () => this.showDetail(i));
       list.appendChild(row);
     }
@@ -342,42 +343,44 @@ class BloXorUI {
     const g = this.g;
     g.curPuzzleInd = i;
     const ld = g.levelData[i];
-    document.getElementById('ld_name').textContent = ld.indexSpaceName;
+    document.getElementById('ld_name').textContent = ld.opened ? ld.indexSpaceName : (i + 1) + ' - ???';
 
     const thumb = document.getElementById('ld_thumb');
-    thumb.alt = ld.name;
-    thumb.src = ld.thumbUrl();
-    thumb.onerror = () => { thumb.style.display = 'none'; };
-    thumb.onload = () => { thumb.style.display = 'block'; };
-
     const desc = document.getElementById('ld_desc');
     const stats = document.getElementById('ld_stats');
     const play = document.getElementById('ld_play');
 
     if (!ld.opened) {
+      thumb.style.display = 'none';
+      thumb.removeAttribute('src');
       desc.textContent = '???';
       stats.classList.add('hidden');
       play.disabled = true;
       play.textContent = 'Locked';
-    } else if (ld.beaten) {
-      desc.innerHTML = '';
-      stats.classList.remove('hidden');
-      const tmin = Math.floor(ld.seconds / 60);
-      const tsec = String(Math.floor(ld.seconds % 60)).padStart(2, '0');
-      const pmin = Math.floor(ld.timePlayed / 60);
-      const psec = String(Math.floor(ld.timePlayed % 60)).padStart(2, '0');
-      stats.innerHTML =
-        'Hi Score: ' + ld.score +
-        '<br>Low Time: ' + tmin + ':' + tsec +
-        '<br>Low Tilts: ' + ld.moves +
-        '<br>First Beat: ' + ld.formattedDateTime(ld.firstBeat) +
-        '<br>Total Plays: ' + ld.playCount +
-        '<br>Total Time: ' + pmin + ':' + psec;
-      play.disabled = false;
-      play.textContent = 'Play';
     } else {
-      desc.innerHTML = ld.getDescriptionHtml();
-      stats.classList.add('hidden');
+      thumb.alt = ld.name;
+      thumb.src = ld.thumbUrl();
+      thumb.onerror = () => { thumb.style.display = 'none'; };
+      thumb.onload = () => { thumb.style.display = 'block'; };
+
+      if (ld.beaten) {
+        desc.innerHTML = '';
+        stats.classList.remove('hidden');
+        const tmin = Math.floor(ld.seconds / 60);
+        const tsec = String(Math.floor(ld.seconds % 60)).padStart(2, '0');
+        const pmin = Math.floor(ld.timePlayed / 60);
+        const psec = String(Math.floor(ld.timePlayed % 60)).padStart(2, '0');
+        stats.innerHTML =
+          'Hi Score: ' + ld.score +
+          '<br>Low Time: ' + tmin + ':' + tsec +
+          '<br>Low Tilts: ' + ld.moves +
+          '<br>First Beat: ' + ld.formattedDateTime(ld.firstBeat) +
+          '<br>Total Plays: ' + ld.playCount +
+          '<br>Total Time: ' + pmin + ':' + psec;
+      } else {
+        desc.innerHTML = ld.getDescriptionHtml();
+        stats.classList.add('hidden');
+      }
       play.disabled = false;
       play.textContent = 'Play';
     }
