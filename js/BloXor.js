@@ -260,3 +260,165 @@ class BloXor {
     this.save.saveUserData();
   }
 }
+
+class BloXorUI {
+  constructor(game) {
+    this.g = game;
+  }
+
+  bind() {
+    const g = this.g;
+    document.getElementById('newGameButton').addEventListener('click', () => {
+      document.getElementById('startScreen').classList.add('hidden');
+      this.showLevelSelect();
+    });
+    document.getElementById('continueButton').addEventListener('click', () => {
+      document.getElementById('startScreen').classList.add('hidden');
+      this.showLevelSelect();
+    });
+    document.getElementById('ps_resume').addEventListener('click', () => g.resumePlay());
+    document.getElementById('ps_restart').addEventListener('click', () => g.restartLevel());
+    document.getElementById('ps_menu').addEventListener('click', () => this.showLevelSelect());
+    document.getElementById('ld_back').addEventListener('click', () => this.closeDetail());
+    document.getElementById('ld_play').addEventListener('click', () => g.playLevel(g.curPuzzleInd));
+    document.getElementById('sc_ok').addEventListener('click', () => {
+      this.closeScore();
+      this.showLevelSelect();
+    });
+    document.getElementById('sb_mute').addEventListener('click', () => {
+      g.setSoundMute(!g.soundManager.muted());
+      g.save.saveUserData();
+    });
+  }
+
+  showStart() {
+    const cont = document.getElementById('continueButton');
+    const hasProgress = this.g.lvlsBeat > 0 || this.g.levelData.some((l) => l.playCount > 0);
+    cont.disabled = !hasProgress;
+    cont.classList.toggle('hidden', !hasProgress);
+    document.getElementById('startScreen').classList.remove('hidden');
+    this.hideMenus();
+    document.getElementById('startScreen').classList.remove('hidden');
+  }
+
+  hideMenus() {
+    document.getElementById('levelSelect').classList.add('hidden');
+    document.getElementById('levelDetail').classList.add('hidden');
+    document.getElementById('pauseScreen').classList.add('hidden');
+    document.getElementById('scoreView').classList.add('hidden');
+    document.getElementById('playHud').classList.add('hidden');
+  }
+
+  showLevelSelect() {
+    const g = this.g;
+    g.gameState = GameState.NoDraw;
+    this.hideMenus();
+    document.getElementById('ls_tot').textContent = String(g.totScore);
+    document.getElementById('ls_beat').textContent = 'Lvls Comp: ' + g.lvlsBeat;
+    document.getElementById('ls_open').textContent = 'Lvls Open: ' + g.lvlsOpen;
+    const tot = g.totTime;
+    document.getElementById('ls_time').textContent =
+      'Tot Time: ' + Math.floor(tot / 3600) + ':' +
+      String(Math.floor((tot / 60) % 60)).padStart(2, '0') + ':' +
+      String(Math.floor(tot % 60 + 0.5)).padStart(2, '0');
+    document.getElementById('ls_plays').textContent = 'Tot Plays: ' + g.totGamesPlayed;
+
+    const list = document.getElementById('ls_list');
+    list.innerHTML = '';
+    for (let i = 0; i < g.levelData.length; i++) {
+      const ld = g.levelData[i];
+      const row = document.createElement('button');
+      row.className = 'ls-row' + (ld.opened ? '' : ' locked');
+      row.type = 'button';
+      const mark = ld.beaten ? 'X' : ld.opened ? '\u25cf' : ' ';
+      const score = ld.beaten ? String(ld.score) : '---';
+      const name = ld.opened ? ld.name : '???';
+      row.textContent = mark + '  ' + (i + 1) + '  ' + name + '   ' + score;
+      row.addEventListener('click', () => this.showDetail(i));
+      list.appendChild(row);
+    }
+    document.getElementById('levelSelect').classList.remove('hidden');
+  }
+
+  showDetail(i) {
+    const g = this.g;
+    g.curPuzzleInd = i;
+    const ld = g.levelData[i];
+    document.getElementById('ld_name').textContent = ld.opened ? ld.indexSpaceName : (i + 1) + ' - ???';
+
+    const thumb = document.getElementById('ld_thumb');
+    const desc = document.getElementById('ld_desc');
+    const stats = document.getElementById('ld_stats');
+    const play = document.getElementById('ld_play');
+
+    if (!ld.opened) {
+      thumb.style.display = 'none';
+      thumb.removeAttribute('src');
+      desc.textContent = '???';
+      stats.classList.add('hidden');
+      play.disabled = true;
+      play.textContent = 'Locked';
+    } else {
+      thumb.alt = ld.name;
+      thumb.src = ld.thumbUrl();
+      thumb.onerror = () => { thumb.style.display = 'none'; };
+      thumb.onload = () => { thumb.style.display = 'block'; };
+
+      if (ld.beaten) {
+        desc.innerHTML = '';
+        stats.classList.remove('hidden');
+        const tmin = Math.floor(ld.seconds / 60);
+        const tsec = String(Math.floor(ld.seconds % 60)).padStart(2, '0');
+        const pmin = Math.floor(ld.timePlayed / 60);
+        const psec = String(Math.floor(ld.timePlayed % 60)).padStart(2, '0');
+        stats.innerHTML =
+          'Hi Score: ' + ld.score +
+          '<br>Low Time: ' + tmin + ':' + tsec +
+          '<br>Low Tilts: ' + ld.moves +
+          '<br>First Beat: ' + ld.formattedDateTime(ld.firstBeat) +
+          '<br>Total Plays: ' + ld.playCount +
+          '<br>Total Time: ' + pmin + ':' + psec;
+      } else {
+        desc.innerHTML = ld.getDescriptionHtml();
+        stats.classList.add('hidden');
+      }
+      play.disabled = false;
+      play.textContent = 'Play';
+    }
+
+    document.getElementById('levelDetail').classList.remove('hidden');
+  }
+
+  closeDetail() {
+    document.getElementById('levelDetail').classList.add('hidden');
+  }
+
+  detailOpen() {
+    return !document.getElementById('levelDetail').classList.contains('hidden');
+  }
+
+  showPause() {
+    this.hideMenus();
+    document.getElementById('pauseScreen').classList.remove('hidden');
+  }
+
+  showScore(cur, best) {
+    document.getElementById('sc_score').textContent = 'Score: ' + cur.score;
+    document.getElementById('sc_score').style.color = best ? '#fff' : '#728CA6';
+    document.getElementById('sc_time').textContent =
+      'Time: ' + Math.floor(cur.seconds / 60) + ':' + String(Math.floor(cur.seconds % 60 + 0.5)).padStart(2, '0');
+    document.getElementById('sc_moves').textContent = 'Tilts: ' + cur.moves;
+    document.getElementById('scoreView').classList.remove('hidden');
+  }
+
+  closeScore() {
+    document.getElementById('scoreView').classList.add('hidden');
+  }
+
+  refreshPlayHud() {}
+
+  syncMute() {
+    const btn = document.getElementById('sb_mute');
+    btn.textContent = this.g.soundManager.muted() ? 'sound off' : 'sound on';
+  }
+}
