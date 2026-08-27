@@ -8,7 +8,7 @@ class LevelIndex {
     g.levelData.length = 0;
     let text = '';
     try {
-      const res = await fetch('assets/puzzles/PuzzleIndex.txt');
+      const res = await fetch('assets/data/PuzzleIndex.txt');
       text = await res.text();
     } catch (e) {
       text = 'Test Slide\tLine up O X O.\n';

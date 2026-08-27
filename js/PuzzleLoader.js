@@ -6,7 +6,7 @@ class PuzzleLoader {
 
   async preload(names) {
     const loads = names.map(async (name) => {
-      const url = 'assets/puzzles/' + name + '.txt';
+      const url = 'assets/data/' + name + '.txt';
       try {
         const res = await fetch(url);
         if (!res.ok) throw new Error(String(res.status));
