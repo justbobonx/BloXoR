@@ -159,6 +159,8 @@ class BloXor {
   }
 
   playLevel(i) {
+    const ld = this.levelData[i];
+    if (!ld || !ld.opened) return;
     this.curPuzzleInd = i;
     this.loader.setupPuzzleI(i);
     this.ui.hideMenus();
@@ -341,18 +343,45 @@ class BloXorUI {
     g.curPuzzleInd = i;
     const ld = g.levelData[i];
     document.getElementById('ld_name').textContent = ld.indexSpaceName;
-    document.getElementById('ld_desc').textContent = ld.opened || true ? ld.getDescription() : '???';
+
+    const thumb = document.getElementById('ld_thumb');
+    thumb.alt = ld.name;
+    thumb.src = ld.thumbUrl();
+    thumb.onerror = () => { thumb.style.display = 'none'; };
+    thumb.onload = () => { thumb.style.display = 'block'; };
+
+    const desc = document.getElementById('ld_desc');
     const stats = document.getElementById('ld_stats');
-    if (ld.beaten) {
-      stats.classList.remove('hidden');
-      stats.textContent =
-        'Hi Score: ' + ld.score +
-        '   Low Time: ' + Math.floor(ld.seconds / 60) + ':' + String(Math.floor(ld.seconds % 60)).padStart(2, '0') +
-        '   Low Tilts: ' + ld.moves;
-    } else {
+    const play = document.getElementById('ld_play');
+
+    if (!ld.opened) {
+      desc.textContent = '???';
       stats.classList.add('hidden');
+      play.disabled = true;
+      play.textContent = 'Locked';
+    } else if (ld.beaten) {
+      desc.innerHTML = '';
+      stats.classList.remove('hidden');
+      const tmin = Math.floor(ld.seconds / 60);
+      const tsec = String(Math.floor(ld.seconds % 60)).padStart(2, '0');
+      const pmin = Math.floor(ld.timePlayed / 60);
+      const psec = String(Math.floor(ld.timePlayed % 60)).padStart(2, '0');
+      stats.innerHTML =
+        'Hi Score: ' + ld.score +
+        '<br>Low Time: ' + tmin + ':' + tsec +
+        '<br>Low Tilts: ' + ld.moves +
+        '<br>First Beat: ' + ld.formattedDateTime(ld.firstBeat) +
+        '<br>Total Plays: ' + ld.playCount +
+        '<br>Total Time: ' + pmin + ':' + psec;
+      play.disabled = false;
+      play.textContent = 'Play';
+    } else {
+      desc.innerHTML = ld.getDescriptionHtml();
+      stats.classList.add('hidden');
+      play.disabled = false;
+      play.textContent = 'Play';
     }
-    document.getElementById('ld_play').disabled = false;
+
     document.getElementById('levelDetail').classList.remove('hidden');
   }
 
