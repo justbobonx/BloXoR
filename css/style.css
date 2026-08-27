@@ -1,0 +1,146 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+  font-family: system-ui, sans-serif;
+}
+
+#game-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  max-width: 1100px;
+  max-height: 100%;
+  margin: 0 auto;
+  background: #000;
+  aspect-ratio: 3 / 2;
+}
+
+#gameCanvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+
+#startScreen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  background: rgba(0, 0, 0, 0.62);
+  color: #fff;
+  z-index: 10;
+}
+
+#startTitle {
+  font-size: clamp(2.4rem, 10vw, 4rem);
+  letter-spacing: 0.08em;
+}
+
+#startEmail {
+  color: #8ec8ff;
+  text-decoration: none;
+}
+
+#startButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: min(80%, 280px);
+}
+
+#startButtons button,
+.panel button {
+  font-family: inherit;
+  font-size: 1.15rem;
+  padding: 12px 22px;
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  background: #2a4a7a;
+  cursor: pointer;
+}
+
+#newGameButton { background: #2a6a2a; }
+
+#startHint {
+  opacity: 0.7;
+  font-size: 0.95rem;
+}
+
+#startVersion {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  font-size: 0.75rem;
+  opacity: 0.55;
+}
+
+.panel {
+  position: absolute;
+  inset: 8%;
+  background: rgba(8, 12, 18, 0.92);
+  color: #fff;
+  border: 1px solid #334;
+  border-radius: 12px;
+  padding: 16px;
+  z-index: 12;
+  overflow: auto;
+}
+
+.panel-title {
+  font-size: 1.4rem;
+  margin-bottom: 10px;
+}
+
+#ls_stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  font-size: 0.9rem;
+  opacity: 0.85;
+  margin-bottom: 10px;
+}
+
+#ls_tot { font-size: 1.6rem; width: 100%; }
+
+#ls_list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 52vh;
+  overflow: auto;
+}
+
+.ls-row {
+  text-align: left;
+  background: #1c2838 !important;
+  font-size: 1rem !important;
+}
+
+.ls-row.locked { opacity: 0.55; }
+
+.row, .col {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.col { flex-direction: column; }
+
+#ld_desc { opacity: 0.85; min-height: 3em; }
+
+.hidden { display: none !important; }
