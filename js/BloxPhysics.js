@@ -236,7 +236,7 @@ class BloxPhysics {
                 else potNewY = hitBlox.pos.y + g.bloxDistMin1;
                 aBlox.vel.y = hitBlox.mover ? hitBlox.vel.y : 0; stoppedy += 1;
               }
-            } else {
+            } else if (this.checkBumpY(aBlox, hitBlox, potNewY)) {
               if (potNewY <= hitBlox.pos.y) potNewY = hitBlox.pos.y - g.bloxDistMin1;
               else potNewY = hitBlox.pos.y + g.bloxDistMin1;
               aBlox.vel.y = hitBlox.mover ? hitBlox.vel.y : 0; stoppedy += 1;
