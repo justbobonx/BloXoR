@@ -180,12 +180,24 @@ class BloxPhysics {
     if (Math.abs(aBlox.vel.x) > g.bloxDist) aBlox.vel.x = g.bloxDistMin1 * Math.sign(aBlox.vel.x);
     if (Math.abs(aBlox.vel.y) > g.bloxDist) aBlox.vel.y = g.bloxDistMin1 * Math.sign(aBlox.vel.y);
 
-    let potNewX = Math.trunc((aBlox.pos.x + aBlox.vel.x) * g.BLOX_POS_PRECISION) / g.BLOX_POS_PRECISION;
-    let potNewY = Math.trunc((aBlox.pos.y + aBlox.vel.y) * g.BLOX_POS_PRECISION) / g.BLOX_POS_PRECISION;
+    const q = (v) => Math.trunc(v * g.BLOX_POS_PRECISION) / g.BLOX_POS_PRECISION;
+    let potNewX = q(aBlox.pos.x + aBlox.vel.x);
+    let potNewY = q(aBlox.pos.y + aBlox.vel.y);
 
     const fieldBlox = [];
     let stoppedx = 0;
     let stoppedy = 0;
+
+    const glueX = (hitBlox) => {
+      potNewX = q(potNewX <= hitBlox.pos.x ? hitBlox.pos.x - g.bloxDistMin1 : hitBlox.pos.x + g.bloxDistMin1);
+      aBlox.vel.x = hitBlox.mover ? hitBlox.vel.x : 0;
+      if (aBlox.vel.x === 0) stoppedx += 1;
+    };
+    const glueY = (hitBlox) => {
+      potNewY = q(potNewY <= hitBlox.pos.y ? hitBlox.pos.y - g.bloxDistMin1 : hitBlox.pos.y + g.bloxDistMin1);
+      aBlox.vel.y = hitBlox.mover ? hitBlox.vel.y : 0;
+      if (aBlox.vel.y === 0) stoppedy += 1;
+    };
 
     const resolveX = () => {
       if (potNewX > g.RIGHT) {
@@ -200,15 +212,9 @@ class BloxPhysics {
           if (this.checkBumpX(aBlox, hitBlox, potNewX)) {
             if (hitBlox.mover && hitBlox.updateCount < g.updateCounter) {
               this.updateTheBlox(hitBlox);
-              if (this.checkBumpX(aBlox, hitBlox, potNewX)) {
-                if (potNewX <= hitBlox.pos.x) potNewX = hitBlox.pos.x - g.bloxDistMin1;
-                else potNewX = hitBlox.pos.x + g.bloxDistMin1;
-                aBlox.vel.x = hitBlox.mover ? hitBlox.vel.x : 0; stoppedx += 1;
-              }
+              if (this.checkBumpX(aBlox, hitBlox, potNewX)) glueX(hitBlox);
             } else if (this.checkBumpX(aBlox, hitBlox, potNewX)) {
-              if (potNewX <= hitBlox.pos.x) potNewX = hitBlox.pos.x - g.bloxDistMin1;
-              else potNewX = hitBlox.pos.x + g.bloxDistMin1;
-              aBlox.vel.x = hitBlox.mover ? hitBlox.vel.x : 0; stoppedx += 1;
+              glueX(hitBlox);
             }
           }
         }
@@ -231,15 +237,9 @@ class BloxPhysics {
           if (this.checkBumpY(aBlox, hitBlox, potNewY)) {
             if (hitBlox.mover && hitBlox.updateCount < g.updateCounter) {
               this.updateTheBlox(hitBlox);
-              if (this.checkBumpY(aBlox, hitBlox, potNewY)) {
-                if (potNewY <= hitBlox.pos.y) potNewY = hitBlox.pos.y - g.bloxDistMin1;
-                else potNewY = hitBlox.pos.y + g.bloxDistMin1;
-                aBlox.vel.y = hitBlox.mover ? hitBlox.vel.y : 0; stoppedy += 1;
-              }
+              if (this.checkBumpY(aBlox, hitBlox, potNewY)) glueY(hitBlox);
             } else if (this.checkBumpY(aBlox, hitBlox, potNewY)) {
-              if (potNewY <= hitBlox.pos.y) potNewY = hitBlox.pos.y - g.bloxDistMin1;
-              else potNewY = hitBlox.pos.y + g.bloxDistMin1;
-              aBlox.vel.y = hitBlox.mover ? hitBlox.vel.y : 0; stoppedy += 1;
+              glueY(hitBlox);
             }
           }
         }
