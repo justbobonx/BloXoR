@@ -9,25 +9,33 @@ class BloxInput {
     this.MOUSE_MAX = 0.22;
     this.MOUSE_DEAD_PX = 10;
     this.MOUSE_FULL_PX = 90;
-    this.joyLev = 0.25;
-    this.joyPow = 0.75;
+    this.joyLev = 0.30;
+    this.joyPow = 0.12;
+    this.MENU_STICK = 0.55;
     this.padIndex = -1;
     this.startHeld = false;
+    this.aHeld = false;
+    this.bHeld = false;
   }
 
   attach(canvas) {
     const g = this.g;
     window.addEventListener('keydown', (e) => {
       this.keys[e.code] = true;
-      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'KeyW', 'KeyA', 'KeyS', 'KeyD', 'Space'].indexOf(e.code) >= 0) {
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'KeyW', 'KeyA', 'KeyS', 'KeyD', 'Space', 'Enter', 'NumpadEnter'].indexOf(e.code) >= 0) {
         e.preventDefault();
       }
       if (e.code === 'Escape') g.backPressed();
-      this.applyKeys();
+      const inPlay = g.gameState === GameState.InPlay || g.gameState === GameState.WaitToStartNewLevel;
+      if ((e.code === 'Enter' || e.code === 'NumpadEnter') && inPlay && !g.ui.menuOpen()) {
+        g.backPressed();
+        return;
+      }
+      if (!g.ui.menuOpen()) this.applyKeys();
     });
     window.addEventListener('keyup', (e) => {
       this.keys[e.code] = false;
-      this.applyKeys();
+      if (!g.ui.menuOpen()) this.applyKeys();
     });
 
     window.addEventListener('gamepadconnected', (e) => {
@@ -63,6 +71,11 @@ class BloxInput {
   }
 
   poll() {
+    if (this.g.ui.menuOpen()) {
+      this.g.downx = 0;
+      this.g.downy = 0;
+      return;
+    }
     if (this.pointerDown) return;
     const stick = this.readStick();
     if (stick) {
@@ -75,6 +88,23 @@ class BloxInput {
     this.pollStart();
   }
 
+  menuButtons() {
+    const pad = this.currentPad();
+    const btn = (i) => !!(pad && pad.buttons && pad.buttons[i] && pad.buttons[i].pressed);
+    const ax = (pad && pad.axes && pad.axes.length >= 2) ? pad.axes : [0, 0];
+    const up = this.keys.ArrowUp || this.keys.KeyW || btn(12) || ax[1] < -this.MENU_STICK;
+    const down = this.keys.ArrowDown || this.keys.KeyS || btn(13) || ax[1] > this.MENU_STICK;
+    const left = this.keys.ArrowLeft || this.keys.KeyA || btn(14) || ax[0] < -this.MENU_STICK;
+    const right = this.keys.ArrowRight || this.keys.KeyD || btn(15) || ax[0] > this.MENU_STICK;
+    const activateHeld = this.keys.Enter || this.keys.NumpadEnter || this.keys.Space || btn(0);
+    const backHeld = btn(1);
+    const activate = activateHeld && !this.aHeld;
+    const back = backHeld && !this.bHeld;
+    this.aHeld = activateHeld;
+    this.bHeld = backHeld;
+    return { up, down, left, right, activate, back };
+  }
+
   readStick() {
     const pad = this.currentPad();
     if (!pad || !pad.axes || pad.axes.length < 2) return null;
@@ -85,7 +115,12 @@ class BloxInput {
   }
 
   currentPad() {
-    const pads = navigator.getGamepads ? navigator.getGamepads() : [];
+    let pads = [];
+    try {
+      pads = navigator.getGamepads ? navigator.getGamepads() : [];
+    } catch (err) {
+      return null;
+    }
     if (this.padIndex >= 0 && pads[this.padIndex]) return pads[this.padIndex];
     for (let i = 0; i < pads.length; i++) {
       if (pads[i] && pads[i].axes && pads[i].axes.length >= 2) {
@@ -105,6 +140,7 @@ class BloxInput {
   }
 
   pollStart() {
+    if (this.g.ui.menuOpen()) return;
     const pad = this.currentPad();
     const start = pad && pad.buttons && pad.buttons[9] && pad.buttons[9].pressed;
     if (start && !this.startHeld) this.g.backPressed();
@@ -113,7 +149,7 @@ class BloxInput {
 
   applyKeys() {
     const g = this.g;
-    if (this.pointerDown) return;
+    if (this.pointerDown || g.ui.menuOpen()) return;
     const hard = this.keys.ShiftLeft || this.keys.ShiftRight;
     const mag = hard ? this.KEY_TILT_HARD : this.KEY_TILT;
     let x = 0;
