@@ -3,6 +3,12 @@ class BloxInput {
     this.g = game;
     this.keys = Object.create(null);
     this.pointerDown = false;
+    this.dragOrigin = null;
+    this.KEY_TILT = 0.12;
+    this.KEY_TILT_HARD = 0.26;
+    this.MOUSE_MAX = 0.22;
+    this.MOUSE_DEAD_PX = 10;
+    this.MOUSE_FULL_PX = 90;
   }
 
   attach(canvas) {
@@ -22,6 +28,11 @@ class BloxInput {
 
     const onDown = (ev) => {
       this.pointerDown = true;
+      const rect = canvas.getBoundingClientRect();
+      this.dragOrigin = {
+        x: ev.clientX - rect.left,
+        y: ev.clientY - rect.top
+      };
       this.handlePointer(ev, canvas, 'down');
     };
     const onMove = (ev) => {
@@ -30,6 +41,7 @@ class BloxInput {
     };
     const onUp = (ev) => {
       this.pointerDown = false;
+      this.dragOrigin = null;
       this.handlePointer(ev, canvas, 'up');
     };
 
@@ -42,12 +54,14 @@ class BloxInput {
   applyKeys() {
     const g = this.g;
     if (this.pointerDown) return;
+    const hard = this.keys.ShiftLeft || this.keys.ShiftRight;
+    const mag = hard ? this.KEY_TILT_HARD : this.KEY_TILT;
     let x = 0;
     let y = 0;
-    if (this.keys.ArrowLeft || this.keys.KeyA) x -= 0.55;
-    if (this.keys.ArrowRight || this.keys.KeyD) x += 0.55;
-    if (this.keys.ArrowUp || this.keys.KeyW) y -= 0.55;
-    if (this.keys.ArrowDown || this.keys.KeyS) y += 0.55;
+    if (this.keys.ArrowLeft || this.keys.KeyA) x -= mag;
+    if (this.keys.ArrowRight || this.keys.KeyD) x += mag;
+    if (this.keys.ArrowUp || this.keys.KeyW) y -= mag;
+    if (this.keys.ArrowDown || this.keys.KeyS) y += mag;
     g.downx = x;
     g.downy = y;
     g.updateMoveCnt();
@@ -89,8 +103,20 @@ class BloxInput {
     }
 
     if (phase === 'move' || phase === 'down') {
-      g.downx = x / rect.width - 0.5;
-      g.downy = y / rect.height - 0.5;
+      const ox = this.dragOrigin ? this.dragOrigin.x : rect.width * 0.5;
+      const oy = this.dragOrigin ? this.dragOrigin.y : rect.height * 0.5;
+      const dx = x - ox;
+      const dy = y - oy;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < this.MOUSE_DEAD_PX) {
+        g.downx = 0;
+        g.downy = 0;
+      } else {
+        const reach = Math.min(1, (dist - this.MOUSE_DEAD_PX) / this.MOUSE_FULL_PX);
+        const scale = (this.MOUSE_MAX * reach) / dist;
+        g.downx = dx * scale;
+        g.downy = dy * scale;
+      }
       g.updateMoveCnt();
     } else if (phase === 'up') {
       g.downx = 0.0;
