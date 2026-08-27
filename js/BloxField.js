@@ -54,13 +54,19 @@ class BloxField {
     if (i >= 0) arr.splice(i, 1);
   }
 
+  _cellOff(delta) {
+    const off = delta % this.g.bloxDist;
+    if (Math.abs(off) < 1 / this.g.BLOX_POS_PRECISION) return 0;
+    return off;
+  }
+
   giveMeListOfFieldPointsFor(x, y, list) {
     const g = this.g;
     list.length = 0;
     const fieldlocx = Math.trunc((x - g.LEFT) / g.bloxDist);
     const fieldlocy = Math.trunc((y - g.TOP) / g.bloxDist);
-    const fieldlocxOff = (x - g.LEFT) % g.bloxDist;
-    const fieldlocyOff = (y - g.TOP) % g.bloxDist;
+    const fieldlocxOff = this._cellOff(x - g.LEFT);
+    const fieldlocyOff = this._cellOff(y - g.TOP);
     if (!this._valid(fieldlocx, fieldlocy)) return;
     list.push(this.field[fieldlocx][fieldlocy]);
     if (fieldlocxOff > 0 && fieldlocx + 1 < g.BLoxCntX && this._valid(fieldlocx + 1, fieldlocy)) {
@@ -79,8 +85,8 @@ class BloxField {
     list.length = 0;
     const fieldlocx = Math.trunc((x - g.LEFT) / g.bloxDist);
     const fieldlocy = Math.trunc((y - g.TOP) / g.bloxDist);
-    const fieldlocxOff = (x - g.LEFT) % g.bloxDist;
-    const fieldlocyOff = (y - g.TOP) % g.bloxDist;
+    const fieldlocxOff = this._cellOff(x - g.LEFT);
+    const fieldlocyOff = this._cellOff(y - g.TOP);
     if (!this._valid(fieldlocx, fieldlocy)) return;
     this._addAll(list, this.field[fieldlocx][fieldlocy]);
     if (fieldlocxOff > 0 && fieldlocx + 1 < g.BLoxCntX && this._valid(fieldlocx + 1, fieldlocy)) {
@@ -99,8 +105,8 @@ class BloxField {
     list.length = 0;
     const fieldlocx = Math.trunc((x - g.LEFT) / g.bloxDist);
     const fieldlocy = Math.trunc((y - g.TOP) / g.bloxDist);
-    const fieldlocxOff = (x - g.LEFT) % g.bloxDist;
-    const fieldlocyOff = (y - g.TOP) % g.bloxDist;
+    const fieldlocxOff = this._cellOff(x - g.LEFT);
+    const fieldlocyOff = this._cellOff(y - g.TOP);
     if (!this._valid(fieldlocx, fieldlocy)) return;
     this._addAll(list, this.underfield[fieldlocx][fieldlocy]);
     if (fieldlocxOff > 0 && fieldlocx + 1 < g.BLoxCntX && this._valid(fieldlocx + 1, fieldlocy)) {
