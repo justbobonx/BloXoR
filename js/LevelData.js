@@ -56,7 +56,13 @@ class LevelData {
     ].join('\t');
   }
 
-  getDescription() {
-    return this.description || 'Good Luck!';
+  thumbUrl() {
+    return 'assets/data/' + this.name + '_t.png';
+  }
+
+  getDescriptionHtml() {
+    let body = this.description || '<center><br>Good Luck!';
+    body = body.replace(/src="(?!https?:|assets\/)/g, 'src="assets/images/');
+    return body;
   }
 }
