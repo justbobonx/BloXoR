@@ -13,8 +13,9 @@ class GameView {
     g.CENTER_Y = g.HEIGHT / 2;
 
     const board = BitmapManager.getInstance().get('whole_bg_ls');
+    const boardW = board ? board.width : 480;
     const boardH = board ? board.height : 320;
-    g.theScale = g.HEIGHT / boardH;
+    g.theScale = Math.min(g.WIDTH / boardW, g.HEIGHT / boardH);
 
     g.bloxDist = 40.0 * g.theScale;
     g.bloxDistDiv2 = g.bloxDist / 2;
