@@ -26,29 +26,26 @@ Single app version lives in `index.html` only (`window.VERSION`). Start-screen l
 - HTML first pass: arrows/WASD and pointer-drag (the old `handleEmuTiltTouch`). `downz` stays 0 unless a later DeviceOrientation pass is added. Do not invent a Z from stick length — that changes friction.
 - In-play tap only detonates `BOMB` under the pointer.
 
+## Assets
+
+```text
+assets/images/    pngs named like Android drawables (whole_bg_ls, blx_o, …)
+assets/data/      PuzzleIndex.txt, each level Name.txt, later helptext.html
+assets/audio/     sfx_slide, sfx_click1, sfx_thud, sfx_fall, sfx_boom, sfx_boom2, sfx_win, sfx_bloxor
+```
+
+No fourth bucket unless a custom font shows up.
+
 ## File map
 
 ```text
-index.html              VERSION + overlays + script order
+index.html
 css/style.css
 dev_notes.md
-js/Coord.js
-js/GfxState.js
-js/BitmapManager.js     placeholders, then real assets if present
-js/Sprite.js
-js/SoundManager.js      stub until sfx land
-js/Blox.js              types + string names from Android
-js/LevelData.js
-js/GameSave.js          localStorage, same tab fields as SharedPreferences
-js/BloxField.js         field / underfield occupancy
-js/BloxPhysics.js       updateTheBlox + bumps + holes + bombs
-js/BloxInput.js
-js/PuzzleLoader.js      name.txt  Type<TAB>x<TAB>y[<TAB>bolts]
-js/LevelIndex.js        PuzzleIndex.txt
-js/GameView.js          scale + draw layers
-js/BloXor.js            orchestrator + UI wiring
-js/main.js
-assets/puzzles/
+js/
+assets/images/
+assets/data/
+assets/audio/
 ```
 
 ## Script order
@@ -57,14 +54,10 @@ VERSION → Coord → GfxState → BitmapManager → Sprite → SoundManager →
 
 ## Puzzle format
 
-`assets/puzzles/PuzzleIndex.txt`: `Name<TAB>description`
+`assets/data/PuzzleIndex.txt`: `Name<TAB>description`
 
-`assets/puzzles/Name.txt`: `Type<TAB>x<TAB>y[<TAB>bolts]`
+`assets/data/Name.txt`: `Type<TAB>x<TAB>y[<TAB>bolts]`
 Types: Wall, 1W_L/R/U/D, Break, BloxO, BloxX, Gener, Bomb, BombI, Hole, PotBr, Bridge
 Grid: x 0..10, y 0..6
-
-## Still Android-only (not in this pass)
-
-DeviceOrientation tilt, real bitmaps/sfx, help HTML, level thumbnails, mid-level piece save (that path was commented out in Java too).
 
 Original Android names: `BloXoRActivity`, `BloXoRMainView`, `Blox`, `Sprite`, `GfxState`, `BitmapManager`, `Coord`, `LevelData`.
