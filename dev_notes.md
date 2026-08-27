@@ -1,4 +1,4 @@
-# WordCracker — dev notes
+# Dev notes
 
 ## How to work in this repo
 
