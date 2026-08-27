@@ -1,3 +1,0 @@
-Test Slide	Line up O X O. Arrows or drag to tilt.
-One Ways	One-way gates only block from one side.
-Holes	Drop a pot-bridge into a hole to fill it. Don't lose O or X.
