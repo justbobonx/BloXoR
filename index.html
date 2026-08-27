@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <title>BloXoR</title>
+  <link rel="stylesheet" href="css/style.css?v=0.1.0">
+</head>
+<body>
+  <div id="game-container">
+    <canvas id="gameCanvas"></canvas>
+
+    <div id="startScreen">
+      <div id="startTitle">BloXoR</div>
+      <a id="startEmail" href="https://x.com/just_bob" target="_blank" rel="noopener noreferrer">just_bob@X.com</a>
+      <div id="startButtons">
+        <button id="newGameButton">PLAY</button>
+        <button id="continueButton" class="hidden" disabled>CONTINUE</button>
+      </div>
+      <div id="startHint">line up O X O · tilt the board</div>
+      <div id="startVersion"></div>
+    </div>
+
+    <div id="playHud" class="hidden"></div>
+
+    <div id="levelSelect" class="panel hidden">
+      <div class="panel-title">Levels</div>
+      <div id="ls_stats">
+        <div id="ls_tot">0</div>
+        <div id="ls_beat"></div>
+        <div id="ls_open"></div>
+        <div id="ls_time"></div>
+        <div id="ls_plays"></div>
+      </div>
+      <div id="ls_list"></div>
+      <button type="button" id="sb_mute">sound on</button>
+    </div>
+
+    <div id="levelDetail" class="panel hidden">
+      <div id="ld_name" class="panel-title"></div>
+      <div id="ld_desc"></div>
+      <div id="ld_stats" class="hidden"></div>
+      <div class="row">
+        <button type="button" id="ld_back">Back</button>
+        <button type="button" id="ld_play">Play</button>
+      </div>
+    </div>
+
+    <div id="pauseScreen" class="panel hidden">
+      <div class="panel-title">Paused</div>
+      <div class="col">
+        <button type="button" id="ps_resume">Resume</button>
+        <button type="button" id="ps_restart">Restart</button>
+        <button type="button" id="ps_menu">Level select</button>
+      </div>
+    </div>
+
+    <div id="scoreView" class="panel hidden">
+      <div class="panel-title">Level done</div>
+      <div id="sc_score"></div>
+      <div id="sc_time"></div>
+      <div id="sc_moves"></div>
+      <button type="button" id="sc_ok">OK</button>
+    </div>
+  </div>
+
+  <script>
+    window.VERSION = '0.1.0';
+    document.getElementById('startVersion').textContent = 'v' + window.VERSION;
+  </script>
+  <script src="js/Coord.js?v=0.1.0"></script>
+  <script src="js/GfxState.js?v=0.1.0"></script>
+  <script src="js/BitmapManager.js?v=0.1.0"></script>
+  <script src="js/Sprite.js?v=0.1.0"></script>
+  <script src="js/SoundManager.js?v=0.1.0"></script>
+  <script src="js/Blox.js?v=0.1.0"></script>
+  <script src="js/LevelData.js?v=0.1.0"></script>
+  <script src="js/GameSave.js?v=0.1.0"></script>
+  <script src="js/BloxField.js?v=0.1.0"></script>
+  <script src="js/BloxPhysics.js?v=0.1.0"></script>
+  <script src="js/BloxInput.js?v=0.1.0"></script>
+  <script src="js/PuzzleLoader.js?v=0.1.0"></script>
+  <script src="js/LevelIndex.js?v=0.1.0"></script>
+  <script src="js/GameView.js?v=0.1.0"></script>
+  <script src="js/BloXor.js?v=0.1.0"></script>
+  <script src="js/main.js?v=0.1.0"></script>
+</body>
+</html>
