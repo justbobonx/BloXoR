@@ -203,12 +203,12 @@ class BloxPhysics {
               if (this.checkBumpX(aBlox, hitBlox, potNewX)) {
                 if (potNewX <= hitBlox.pos.x) potNewX = hitBlox.pos.x - g.bloxDistMin1;
                 else potNewX = hitBlox.pos.x + g.bloxDistMin1;
-                aBlox.vel.x = 0; stoppedx += 1;
+                aBlox.vel.x = hitBlox.mover ? hitBlox.vel.x : 0; stoppedx += 1;
               }
             } else if (this.checkBumpX(aBlox, hitBlox, potNewX)) {
               if (potNewX <= hitBlox.pos.x) potNewX = hitBlox.pos.x - g.bloxDistMin1;
               else potNewX = hitBlox.pos.x + g.bloxDistMin1;
-              aBlox.vel.x = 0; stoppedx += 1;
+              aBlox.vel.x = hitBlox.mover ? hitBlox.vel.x : 0; stoppedx += 1;
             }
           }
         }
@@ -234,12 +234,12 @@ class BloxPhysics {
               if (this.checkBumpY(aBlox, hitBlox, potNewY)) {
                 if (potNewY <= hitBlox.pos.y) potNewY = hitBlox.pos.y - g.bloxDistMin1;
                 else potNewY = hitBlox.pos.y + g.bloxDistMin1;
-                aBlox.vel.y = 0; stoppedy += 1;
+                aBlox.vel.y = hitBlox.mover ? hitBlox.vel.y : 0; stoppedy += 1;
               }
             } else {
               if (potNewY <= hitBlox.pos.y) potNewY = hitBlox.pos.y - g.bloxDistMin1;
               else potNewY = hitBlox.pos.y + g.bloxDistMin1;
-              aBlox.vel.y = 0; stoppedy += 1;
+              aBlox.vel.y = hitBlox.mover ? hitBlox.vel.y : 0; stoppedy += 1;
             }
           }
         }
