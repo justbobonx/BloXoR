@@ -1,3 +1,83 @@
-Test Slide	Line up O X O. Arrows or drag to tilt.
-One Ways	One-way gates only block from one side.
-Holes	Drop a pot-bridge into a hole to fill it. Don't lose O or X.
+﻿
+Hello BloXoR	To complete a level, you must line up the <img src="blx-O.png" width=18 height=18>, <img src="blx-X.png" width=18 height=18>, and <img src="blx-O.png" width=18 height=18> Blox by titling the device and sliding the Blox around.
+Step Two	With a little effort, you can rearrange Blox.  Remember, you have to line up the <img src="blx-O.png" width=18 height=18><img src="blx-X.png" width=18 height=18><img src="blx-O.png" width=18 height=18> Blox in that order.  (They can be lined up horizontally or vertically.)
+A Twist	Bring up the <b>Pause Menu</b> at any time by tapping the Back or Menu buttons.  From the pause menu, you can Resume or Restart the current level, or Exit back to the Main Menu.
+Obstacles	Too easy? We'll throw in some <img src="blx-generic-movable.png" width=18 height=18> Blox. They don't do anything.  They just slide around and generally get in your way.
+Curves	Now you're getting the hang of it.  Keep an eye on what all the Blox are doing.
+A Drop in the Bucket	The score is based on how much time you take as well as how many Tilts it takes you to complete a level.
+Follow the Leader	Blox not quite in line?  Try tapping the edge of the device.
+Break Stuff	Stuck? Look for a cracked Wall <img src="blx-breakable.png" width=18 height=18> Blox.  It can be blown up by a Bomb <img src="blx-bomb.png" width=18 height=18> Blox.  Maneuver the Bomb Blox into position and then <b>tap</b> it to detonate.  Bomb Blox can also blow up other Bomb Blox, creating chain reactions.
+One Way Streets	One-Way <img src="blx-oneway-right.png" width=18 height=18> Blox let Blox slide through them in the direction the arrow indicates.  Be careful, sometimes once you go in, you can't get back out.
+Dominoes	Sometimes you'll find Inactive Bomb <img src="blx-bomb-inactive.png" width=18 height=18> Blox.  They can not be detonated by themselves, but can be blown up by adjacent Bomb <img src="blx-bomb.png" width=18 height=18> Blox, and work great in chain reactions.
+A Hole New Ballgame	Watch out for <b>Holes</b>!  They looke like this. <img src="blx-hole.png" width=18 height=18> Blox can fall in and they don't come out.  If you lose an essential Blox, you'll have to start the level over. (Use the Pause Menu.)
+Catwalk	Blox can hang partially over a hole without falling in.  Use that to your advantage.
+Bridging the Gaps	Too many holes? Use a Bridge <img src="blx-bridge-pot.png" width=18 height=18> Blox to create a  bridge over a hole, like this <img src="blx-bridge-on-a-hole.png" width=18 height=18> 
+Flotsam	Sometimes holes can be used to get rid of unwanted Blox.
+Bullseye	Having a Blox stuck in the wrong position is as bad as losing it down a Hole.  Remember, you can always restart from the pause menu.
+All for One	Let's put it all together.  Take things one step at a time.
+Archeology
+At Both Ends
+Fragile Spiral
+Build Break Repeat
+Break Out
+Quick Wrist
+Fissures
+Meet You at the Park
+Circles
+The Hills
+Circuitous Combos
+One Path
+Ying Yang
+Compartmentalized
+Look Out Lucy
+The Inside Track
+Seesaw
+Conveyor Belt
+Tapdancing Tadpoles
+Crumbling Labyrinth
+Waterfall
+Dizzy
+Lattice
+Side By Side
+House of Mirrors
+Double Down
+Filling in the Gaps
+Combination Lock
+The Long Lonely Path
+Get Outta the Way
+Head of a Pin
+Sour Snake
+Here Nor There
+Island
+Jumping Jackson
+Bricked In
+Black Hole
+One Fuse
+Pocket Pool
+Going Down
+Which One Way
+Locked Out
+Make Your Own Way
+One Path Too
+More Bang for the Buck
+On the Outskirts
+Strip-Mine
+Perforated
+Two X One Way
+River Crossing
+Potholes
+Glass House
+Sawtooth
+Catwalk Too
+Sliders
+Wandering Trio
+Snow Plow
+Stuck in the Middle
+Teamwork
+The Shuffle
+Waiting in Line
+Spelunker
+Braided Insaned
+Turnabout
+LockStep
+Donut with Sprinkles

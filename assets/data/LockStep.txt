@@ -1,0 +1,52 @@
+
+1W_L	2	0
+Bomb	4	0
+Wall	5	0
+Bomb	6	0
+1W_R	9	0
+
+1W_U	0	1
+Wall	1	1
+Wall	2	1
+Wall	4	1
+Wall	5	1
+Wall	6	1
+Wall	7	1
+Wall	9	1
+Wall	10	1
+
+Break	2	2
+Gener	5	2
+Wall	9	2
+BloxO	10	2
+
+Wall	1	3
+Wall	2	3
+Wall	3	3
+Gener	4	3
+Gener	5	3
+Gener	6	3
+Wall	7	3
+Wall	8	3
+Wall	9	3
+
+BloxO	0	4
+Wall	1	4
+Gener	5	4
+Break	8	4
+
+Wall	0	5
+Wall	1	5
+Wall	3	5
+Wall	4	5
+Wall	5	5
+Wall	6	5
+Wall	8	5
+Wall	9	5
+1W_D	10	5
+
+1W_L	1	6
+BloxX	4	6
+Wall	5	6
+Bomb	6	6
+1W_R	8	6

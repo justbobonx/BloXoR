@@ -1,0 +1,60 @@
+
+BloxO	0	0
+BombI	1	0	bolts
+BombI	2	0	bolts
+Gener	3	0
+BombI	5	0	bolts
+Gener	7	0
+BombI	8	0	bolts
+BombI	9	0	bolts
+BloxO	10	0
+
+BombI	0	1	bolts
+BombI	1	1	bolts
+BombI	2	1	bolts
+BombI	4	1	bolts
+BombI	5	1	bolts
+BombI	6	1	bolts
+BombI	8	1	bolts
+BombI	9	1	bolts
+BombI	10	1	bolts
+
+BombI	1	2	bolts
+BombI	3	2
+BombI	7	2
+BombI	9	2	bolts
+
+Gener	0	3
+BombI	2	3
+BombI	3	3
+BombI	4	3
+Bomb	5	3
+BombI	6	3
+BombI	7	3
+BombI	8	3
+Gener	10	3
+
+BombI	1	4	bolts
+BombI	3	4
+BombI	7	4
+BombI	9	4	bolts
+
+BombI	0	5	bolts
+BombI	1	5	bolts
+BombI	2	5	bolts
+BombI	4	5	bolts
+BombI	5	5	bolts
+BombI	6	5	bolts
+BombI	8	5	bolts
+BombI	9	5	bolts
+BombI	10	5	bolts
+
+BombI	0	6	bolts
+BombI	1	6	bolts
+Gener	3	6
+BombI	4	6	bolts
+BloxX	5	6
+BombI	6	6	bolts
+Gener	7	6
+BombI	9	6	bolts
+BombI	10	6	bolts

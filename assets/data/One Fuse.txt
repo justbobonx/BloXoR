@@ -1,0 +1,75 @@
+
+Hole	0	0
+Hole	1	0
+Hole	2	0
+Hole	3	0
+Hole	4	0
+Hole	5	0
+Hole	6	0
+Hole	7	0
+Hole	8	0
+Hole	9	0
+Hole	10	0
+
+
+Hole	0	1
+Bomb	1	1	bolts
+Bomb	2	1	bolts
+Bomb	3	1	bolts
+Bomb	4	1	bolts
+Bomb	5	1	bolts
+Bomb	6	1	bolts
+BloxO	7	1
+Hole	10	1
+
+
+Hole	0	2
+Bomb	1	2	bolts
+Break	2	2
+Break	3	2
+Break	4	2
+BloxX	5	2
+Break	6	2
+BloxO	7	2
+Hole	10	2
+
+
+Hole	0	3
+Bomb	1	3	bolts
+Break	2	3
+Bomb	3	3	bolts
+Bomb	4	3	bolts
+Bomb	5	3	bolts
+Bomb	6	3	bolts
+Bomb	7	3	bolts
+Bomb	8	3	bolts
+Hole	10	3
+
+
+Hole	0	4
+Bomb	1	4	bolts
+Break	2	4
+Bomb	3	4	bolts
+Bomb	5	4	bolts
+Bomb	8	4	bolts
+Hole	10	4
+
+
+Hole	0	5
+Bomb	1	5	bolts
+Bomb	2	5	bolts
+Bomb	3	5	bolts
+Hole	10	5
+
+
+Hole	0	6
+Hole	1	6
+Hole	2	6
+Hole	3	6
+Hole	4	6
+Hole	5	6
+Hole	6	6
+Hole	7	6
+Hole	8	6
+Hole	9	6
+Hole	10	6

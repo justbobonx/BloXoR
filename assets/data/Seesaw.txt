@@ -1,0 +1,84 @@
+
+BloxO	0	0
+Bomb	1	0	bolts
+BombI	2	0
+BombI	3	0
+BombI	4	0
+BombI	5	0
+BombI	6	0
+BombI	7	0
+BombI	8	0
+BombI	9	0
+
+
+Wall	0	1
+Wall	1	1
+Wall	2	1
+Wall	3	1
+Wall	4	1
+Wall	5	1
+Wall	6	1
+Wall	7	1
+Wall	8	1
+Wall	9	1
+BombI	10	1	bolts
+
+
+BombI	1	2
+BombI	2	2
+BombI	3	2
+BombI	4	2
+BombI	5	2
+BombI	6	2
+BombI	7	2
+BombI	8	2
+BombI	9	2
+
+
+BombI	0	3	bolts
+Wall	1	3
+Wall	2	3
+Wall	3	3
+Wall	4	3
+BloxX	5	3
+Wall	6	3
+Wall	7	3
+Wall	8	3
+Wall	9	3
+Wall	10	3
+
+
+BombI	1	4
+BombI	2	4
+BombI	3	4
+BombI	4	4
+BombI	5	4
+BombI	6	4
+BombI	7	4
+BombI	8	4
+BombI	9	4
+
+
+Wall	0	5
+Wall	1	5
+Wall	2	5
+Wall	3	5
+Wall	4	5
+Wall	5	5
+Wall	6	5
+Wall	7	5
+Wall	8	5
+Wall	9	5
+BombI	10	5	bolts
+
+
+BloxO	0	6
+BombI	1	6
+BombI	2	6
+BombI	3	6
+BombI	4	6
+BombI	5	6
+BombI	6	6
+BombI	7	6
+BombI	8	6
+BombI	9	6

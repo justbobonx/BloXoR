@@ -1,0 +1,53 @@
+
+Gener	0	0
+1W_R	2	0
+Gener	4	0
+1W_L	5	0
+Gener	6	0
+1W_R	8	0
+Gener	10	0
+
+1W_L	2	1
+1W_R	5	1
+1W_L	8	1
+
+Gener	1	2
+1W_R	2	2
+Gener	3	2
+1W_L	5	2
+Gener	7	2
+1W_R	8	2
+Gener	9	2
+
+1W_D	0	3
+1W_U	1	3
+Wall	2	3
+1W_U	3	3
+1W_D	4	3
+BloxX	5	3
+1W_U	6	3
+1W_D	7	3
+Wall	8	3
+1W_D	9	3
+1W_U	10	3
+
+Gener	1	4
+1W_L	2	4
+Gener	3	4
+1W_R	5	4
+Gener	7	4
+1W_L	8	4
+Gener	9	4
+
+1W_R	2	5
+1W_L	5	5
+1W_R	8	5
+
+BloxO	0	6
+1W_L	2	6
+Gener	4	6
+1W_R	5	6
+Gener	6	6
+1W_L	8	6
+BloxO	10	6
+

@@ -1,0 +1,65 @@
+
+BloxX	0	0
+Wall	1	0
+PotBr	2	0
+Bomb	3	0
+Wall	4	0
+Bomb	5	0
+Wall	6	0
+Bomb	7	0
+Wall	8	0
+Wall	9	0
+BloxO	10	0	bolts
+
+Break	0	1
+Gener	1	1
+PotBr	2	1
+Bomb	3	1
+Wall	4	1
+PotBr	5	1
+Wall	6	1
+PotBr	7	1
+Wall	8	1
+
+Wall	1	2
+Wall	2	2
+Wall	3	2
+Wall	4	2
+Break	5	2
+Wall	6	2
+Break	7	2
+Wall	8	2
+Break	9	2
+BloxO	10	2	bolts
+
+Wall	1	3
+Hole	2	3
+PotBr	3	3
+Wall	4	3
+Hole	5	3
+Hole	6	3
+Hole	7	3
+Wall	8	3
+Hole	10	3
+
+Wall	1	4
+Bomb	2	4
+Hole	3	4
+Wall	8	4
+Hole	10	4
+
+Hole	0	5
+Wall	1	5
+Wall	2	5
+Wall	4	5
+Wall	8	5
+Break	9	5
+Hole	10	5
+
+Hole	1	6
+Wall	4	6
+PotBr	5	6
+PotBr	6	6
+Hole	8	6
+Hole	9	6
+Hole	10	6

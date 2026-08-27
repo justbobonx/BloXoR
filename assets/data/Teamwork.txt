@@ -1,0 +1,36 @@
+
+Hole	0	0
+Hole	10	0
+
+Break	2	1
+Hole	3	1
+Hole	7	1
+Break	8	1
+
+Break	1	2
+BloxO	2	2
+Break	3	2
+Break	7	2
+BloxO	8	2
+Break	9	2
+
+Break	2	3
+Hole	4	3
+Break	5	3
+Hole	6	3
+Break	8	3
+
+Hole	0	4
+Break	4	4
+BloxX	5	4
+Break	6	4
+Hole	10	4
+
+Break	5	5
+
+Hole	0	6
+BombI	2	6
+Bomb	5	6
+BombI	8	6
+Hole	10	6
+

@@ -1,0 +1,80 @@
+
+Wall	0	0
+Gener	1	0
+Gener	2	0
+Gener	3	0
+Gener	4	0
+BloxO	5	0
+Gener	6	0
+Gener	7	0
+Gener	8	0
+Gener	9	0
+Wall	10	0
+
+Wall	0	1
+Wall	2	1
+Wall	3	1
+Wall	4	1
+Wall	5	1
+Wall	6	1
+Wall	7	1
+Wall	8	1
+Wall	10	1
+
+Wall	0	2
+Gener	1	2
+Gener	2	2
+Gener	3	2
+Gener	4	2
+Gener	5	2
+Gener	6	2
+Gener	7	2
+Gener	8	2
+Gener	9	2
+Wall	10	2
+
+Wall	0	3
+Wall	1	3
+Wall	2	3
+Wall	3	3
+Wall	4	3
+BloxX	5	3
+Wall	6	3
+Wall	7	3
+Wall	8	3
+Wall	9	3
+Wall	10	3
+
+Wall	0	4
+Gener	1	4
+Gener	2	4
+Gener	3	4
+Gener	4	4
+Gener	5	4
+Gener	6	4
+Gener	7	4
+Gener	8	4
+Gener	9	4
+Wall	10	4
+
+Wall	0	5
+Wall	2	5
+Wall	3	5
+Wall	4	5
+Wall	5	5
+Wall	6	5
+Wall	7	5
+Wall	8	5
+Wall	10	5
+
+Wall	0	6
+Gener	1	6
+Gener	2	6
+Gener	3	6
+Gener	4	6
+BloxO	5	6
+Gener	6	6
+Gener	7	6
+Gener	8	6
+Gener	9	6
+Wall	10	6

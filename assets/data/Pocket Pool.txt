@@ -1,0 +1,37 @@
+
+Hole	0	0
+Hole	1	0
+Hole	4	0
+Hole	5	0
+Hole	6	0
+Hole	9	0
+Hole	10	0
+
+Hole	0	1
+Hole	5	1
+Gener	8	1
+Hole	10	1
+
+Gener	7	2
+BloxO	8	2
+
+BloxX	2	3
+Gener	6	3
+Gener	7	3
+Gener	8	3
+
+Gener	7	4
+BloxO	8	4
+
+Hole	0	5
+Hole	5	5
+Gener	8	5
+Hole	10	5
+
+Hole	0	6
+Hole	1	6
+Hole	4	6
+Hole	5	6
+Hole	6	6
+Hole	9	6
+Hole	10	6

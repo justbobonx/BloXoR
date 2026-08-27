@@ -1,0 +1,49 @@
+
+BloxX	0	0
+Break	1	0
+BombI	5	0
+Break	9	0
+BloxO	10	0
+
+Break	0	1
+BombI	4	1
+BombI	5	1
+BombI	6	1
+Break	10	1
+
+BombI	3	2
+BombI	4	2
+BombI	5	2
+BombI	6	2
+BombI	7	2
+
+Wall	0	3
+Wall	1	3
+Wall	2	3
+Wall	3	3
+Wall	4	3
+Bomb	5	3
+Wall	6	3
+Wall	7	3
+Wall	8	3
+Wall	9	3
+Wall	10	3
+
+BombI	3	4
+BombI	4	4
+BombI	5	4
+BombI	6	4
+BombI	7	4
+
+Break	0	5
+BombI	4	5
+BombI	5	5
+BombI	6	5
+Break	10	5
+
+BloxO	0	6
+Break	1	6
+BombI	5	6
+Break	9	6
+Bomb	10	6
+

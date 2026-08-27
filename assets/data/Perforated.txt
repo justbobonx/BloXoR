@@ -1,0 +1,26 @@
+
+BloxO	0	0
+Hole	1	0
+Hole	6	0
+
+Hole	3	1
+Hole	9	1
+
+Hole	2	2
+Hole	7	2
+
+Hole	0	3
+Hole	4	3
+BloxX	5	3
+Hole	6	3
+Hole	10	3
+
+Hole	3	4
+Hole	8	4
+
+Hole	1	5
+Hole	7	5
+
+Hole	4	6
+Hole	9	6
+BloxO	10	6

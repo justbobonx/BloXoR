@@ -1,0 +1,53 @@
+
+Gener	0	0
+BombI	1	0
+Wall	2	0
+Wall	8	0
+BombI	9	0
+Gener	10	0
+
+Wall	1	1
+Break	4	1
+Break	5	1
+Break	6	1
+Wall	9	1
+
+Gener	0	2
+Break	3	2
+BombI	4	2
+Break	5	2
+BombI	6	2
+Break	7	2
+Gener	10	2
+
+Bomb	0	3
+Gener	1	3
+Break	3	3
+Break	4	3
+BloxX	5	3
+Break	6	3
+Break	7	3
+Gener	9	3
+Bomb	10	3
+
+Gener	0	4
+Wall	3	4
+BloxO	4	4
+Break	5	4
+BloxO	6	4
+Wall	7	4
+Gener	10	4
+
+Wall	1	5
+Wall	4	5
+Break	5	5
+Wall	6	5
+Wall	9	5
+
+Gener	0	6
+BombI	1	6
+Wall	2	6
+Wall	8	6
+BombI	9	6
+Gener	10	6
+

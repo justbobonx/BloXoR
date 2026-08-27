@@ -1,0 +1,50 @@
+
+Gener	1	0
+Wall	5	0
+Gener	9	0
+
+Gener	0	1
+Wall	1	1
+Wall	3	1
+Wall	5	1
+Wall	7	1
+Wall	9	1
+Gener	10	1
+
+Wall	0	2
+Wall	1	2
+Wall	3	2
+Wall	5	2
+Wall	7	2
+Wall	9	2
+Wall	10	2
+
+Wall	3	3
+Gener	4	3
+BloxX	5	3
+Gener	6	3
+Wall	7	3
+
+Wall	1	4
+Wall	2	4
+Wall	3	4
+Wall	4	4
+Wall	5	4
+Wall	6	4
+Wall	7	4
+Wall	8	4
+Wall	9	4
+
+Wall	1	5
+Gener	4	5
+Wall	5	5
+Gener	6	5
+Wall	9	5
+
+Gener	0	6
+Wall	3	6
+BloxO	4	6
+Wall	5	6
+BloxO	6	6
+Wall	7	6
+Gener	10	6

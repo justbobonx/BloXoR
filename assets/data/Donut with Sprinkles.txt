@@ -1,0 +1,68 @@
+
+Hole	0	0
+Hole	1	0
+Hole	2	0
+Hole	3	0
+Hole	4	0
+Hole	5	0
+Hole	6	0
+Hole	7	0
+Hole	8	0
+Hole	9	0
+Hole	10	0
+
+Hole	0	1
+Hole	1	1
+Wall	2	1
+Wall	8	1
+Hole	9	1
+Hole	10	1
+
+Hole	0	2
+Gener	1	2
+Gener	3	2
+Wall	4	2
+BloxX	5	2
+Wall	6	2
+Gener	7	2
+Gener	9	2
+Hole	10	2
+
+Hole	0	3
+Wall	1	3
+Wall	3	3
+Hole	4	3
+Hole	5	3
+Hole	6	3
+Wall	7	3
+Wall	9	3
+Hole	10	3
+
+Hole	0	4
+Gener	1	4
+BloxO	3	4
+Wall	4	4
+Gener	5	4
+Wall	6	4
+BloxO	7	4
+Gener	9	4
+Hole	10	4
+
+Hole	0	5
+Hole	1	5
+Wall	2	5
+Wall	8	5
+Hole	9	5
+Hole	10	5
+
+Hole	0	6
+Hole	1	6
+Hole	2	6
+Hole	3	6
+Hole	4	6
+Hole	5	6
+Hole	6	6
+Hole	7	6
+Hole	8	6
+Hole	9	6
+Hole	10	6

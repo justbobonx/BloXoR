@@ -1,0 +1,40 @@
+
+Wall	2	0
+Wall	3	0
+Wall	7	0
+
+Wall	2	1
+Wall	5	1
+Wall	7	1
+Wall	9	1
+
+Wall	1	2
+Wall	2	2
+Wall	4	2
+Gener	5	2
+BloxO	6	2
+Wall	7	2
+Wall	9	2
+
+Wall	1	3
+Wall	4	3
+BloxX	5	3
+Wall	6	3
+Wall	9	3
+
+Wall	1	4
+Wall	3	4
+BloxO	4	4
+Gener	5	4
+Wall	6	4
+Wall	8	4
+Wall	9	4
+
+Wall	1	5
+Wall	3	5
+Wall	5	5
+Wall	8	5
+
+Wall	3	6
+Wall	7	6
+Wall	8	6

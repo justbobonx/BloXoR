@@ -1,0 +1,46 @@
+
+Hole	0	0
+Hole	1	0
+Hole	2	0
+Wall	3	0
+Wall	7	0
+Hole	8	0
+Hole	9	0
+Hole	10	0
+
+Hole	0	1
+Hole	1	1
+Hole	9	1
+Hole	10	1
+
+Wall	0	2
+Hole	3	2
+Hole	4	2
+Wall	10	2
+
+BloxO	0	3
+Hole	3	3
+BloxX	5	3
+Hole	7	3
+BloxO	10	3
+
+Wall	0	4
+Hole	6	4
+Hole	7	4
+Wall	10	4
+
+Hole	0	5
+Hole	1	5
+Hole	9	5
+Hole	10	5
+
+Hole	0	6
+Hole	1	6
+Hole	2	6
+Hole	3	6
+Wall	4	6
+Wall	6	6
+Hole	7	6
+Hole	8	6
+Hole	9	6
+Hole	10	6
