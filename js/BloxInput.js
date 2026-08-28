@@ -35,6 +35,23 @@ class BloxInput {
     this.onOrient = (e) => this.handleOrientation(e);
   }
 
+  btn(i) {
+    const pad = this.currentPad();
+    return !!(pad && pad.buttons && pad.buttons[i] && pad.buttons[i].pressed);
+  }
+
+  absorbButtons() {
+    const a = !!(this.keys.Space || this.keys.Enter || this.keys.NumpadEnter || this.btn(0));
+    const b = this.btn(1);
+    const start = this.btn(9);
+    this.actHeld = !!(this.keys.Space || this.btn(0));
+    this.aHeld = a;
+    this.bHeld = b;
+    this.startHeld = start || b;
+    this.ignoreInteract = this.actHeld;
+    this.iaDirHeld = 'hold';
+  }
+
   attach(canvas) {
     const g = this.g;
     window.addEventListener('keydown', (e) => {
@@ -54,6 +71,7 @@ class BloxInput {
           return;
         }
         if (g.gameState === GameState.InPlay) {
+          if (this.ignoreInteract) return;
           if (g.waitingOnAct) g.confirmInteract();
           else g.beginInteract();
           return;
@@ -283,13 +301,17 @@ class BloxInput {
 
   pollAct() {
     const held = this.actDown();
-    if (this.g.gameState === GameState.WaitToStartNewLevel) {
-      if (held && !this.actHeld) this.g.startFromWait(true);
-      this.actHeld = held;
-      return;
-    }
     if (this.ignoreInteract) {
       if (!held) this.ignoreInteract = false;
+      this.actHeld = held;
+      if (this.g.gameState === GameState.WaitToStartNewLevel && !held) {
+        /* wait for a fresh press to start */
+      } else {
+        return;
+      }
+    }
+    if (this.g.gameState === GameState.WaitToStartNewLevel) {
+      if (held && !this.actHeld) this.g.startFromWait(true);
       this.actHeld = held;
       return;
     }
@@ -305,34 +327,32 @@ class BloxInput {
   }
 
   actDown() {
-    const pad = this.currentPad();
-    const btnA = !!(pad && pad.buttons && pad.buttons[0] && pad.buttons[0].pressed);
-    return !!(this.keys.Space || btnA);
+    return !!(this.keys.Space || this.btn(0));
   }
 
   pollInteractMove() {
-    const pad = this.currentPad();
-    const btn = (i) => !!(pad && pad.buttons && pad.buttons[i] && pad.buttons[i].pressed);
-    const ax = (pad && pad.axes && pad.axes.length >= 2) ? pad.axes : [0, 0];
+    const ax = (() => {
+      const pad = this.currentPad();
+      return (pad && pad.axes && pad.axes.length >= 2) ? pad.axes : [0, 0];
+    })();
     let dir = '';
-    if (this.keys.ArrowDown || this.keys.KeyS || btn(13) || ax[1] > this.MENU_STICK) dir = 'down';
-    else if (this.keys.ArrowUp || this.keys.KeyW || btn(12) || ax[1] < -this.MENU_STICK) dir = 'up';
-    else if (this.keys.ArrowLeft || this.keys.KeyA || btn(14) || ax[0] < -this.MENU_STICK) dir = 'left';
-    else if (this.keys.ArrowRight || this.keys.KeyD || btn(15) || ax[0] > this.MENU_STICK) dir = 'right';
+    if (this.keys.ArrowDown || this.keys.KeyS || this.btn(13) || ax[1] > this.MENU_STICK) dir = 'down';
+    else if (this.keys.ArrowUp || this.keys.KeyW || this.btn(12) || ax[1] < -this.MENU_STICK) dir = 'up';
+    else if (this.keys.ArrowLeft || this.keys.KeyA || this.btn(14) || ax[0] < -this.MENU_STICK) dir = 'left';
+    else if (this.keys.ArrowRight || this.keys.KeyD || this.btn(15) || ax[0] > this.MENU_STICK) dir = 'right';
     if (dir && dir !== this.iaDirHeld) this.g.stepInteract(dir);
     this.iaDirHeld = dir;
   }
 
   menuButtons() {
     const pad = this.currentPad();
-    const btn = (i) => !!(pad && pad.buttons && pad.buttons[i] && pad.buttons[i].pressed);
     const ax = (pad && pad.axes && pad.axes.length >= 2) ? pad.axes : [0, 0];
-    const up = this.keys.ArrowUp || this.keys.KeyW || btn(12) || ax[1] < -this.MENU_STICK;
-    const down = this.keys.ArrowDown || this.keys.KeyS || btn(13) || ax[1] > this.MENU_STICK;
-    const left = this.keys.ArrowLeft || this.keys.KeyA || btn(14) || ax[0] < -this.MENU_STICK;
-    const right = this.keys.ArrowRight || this.keys.KeyD || btn(15) || ax[0] > this.MENU_STICK;
-    const activateHeld = this.keys.Enter || this.keys.NumpadEnter || this.keys.Space || btn(0);
-    const backHeld = btn(1);
+    const up = this.keys.ArrowUp || this.keys.KeyW || this.btn(12) || ax[1] < -this.MENU_STICK;
+    const down = this.keys.ArrowDown || this.keys.KeyS || this.btn(13) || ax[1] > this.MENU_STICK;
+    const left = this.keys.ArrowLeft || this.keys.KeyA || this.btn(14) || ax[0] < -this.MENU_STICK;
+    const right = this.keys.ArrowRight || this.keys.KeyD || this.btn(15) || ax[0] > this.MENU_STICK;
+    const activateHeld = this.keys.Enter || this.keys.NumpadEnter || this.keys.Space || this.btn(0);
+    const backHeld = this.btn(1);
     const activate = activateHeld && !this.aHeld;
     const back = backHeld && !this.bHeld;
     this.aHeld = activateHeld;
@@ -376,14 +396,13 @@ class BloxInput {
 
   pollStart() {
     if (this.g.ui.menuOpen()) return;
-    const pad = this.currentPad();
-    const btn = (i) => !!(pad && pad.buttons && pad.buttons[i] && pad.buttons[i].pressed);
-    const start = btn(9);
-    const b = btn(1);
+    const start = this.btn(9);
+    const b = this.btn(1);
     if (this.g.gameState === GameState.WaitToStartNewLevel) {
       if (b && !this.bHeld) this.g.startFromWait(true);
       if (start && !this.startHeld) this.g.backPressed();
       this.startHeld = start;
+      this.bHeld = b;
       return;
     }
     if ((start || b) && !this.startHeld) this.g.backPressed();
