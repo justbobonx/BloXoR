@@ -86,6 +86,22 @@ class BloxInput {
     window.addEventListener('pointercancel', onUp);
   }
 
+  toWorld(ev, canvas) {
+    const g = this.g;
+    const rect = canvas.getBoundingClientRect();
+    const cssX = ev.clientX - rect.left;
+    const cssY = ev.clientY - rect.top;
+    const cx = cssX * (canvas.width / rect.width);
+    const cy = cssY * (canvas.height / rect.height);
+    const scale = g.viewScale || 1;
+    return {
+      x: (cx - (g.viewOx || 0)) / scale,
+      y: (cy - (g.viewOy || 0)) / scale,
+      cssX,
+      cssY
+    };
+  }
+
   enableTilt() {
     if (this.tiltAttached || this.tiltDenied || this.tiltBusy) return;
     this.tiltBusy = true;
@@ -315,6 +331,7 @@ class BloxInput {
     const rect = canvas.getBoundingClientRect();
     const x = ev.clientX - rect.left;
     const y = ev.clientY - rect.top;
+    const world = this.toWorld(ev, canvas);
 
     if (g.gameState === GameState.LevelBeat) {
       if (phase === 'down') {
@@ -326,18 +343,14 @@ class BloxInput {
     }
 
     if (g.gameState === GameState.InPlay && phase === 'up') {
-      const touchx = x * (g.WIDTH / rect.width) - g.TOUCH_LEFT;
-      const touchy = y * (g.HEIGHT / rect.height) - g.TOUCH_TOP;
-      const tx = Math.trunc((touchx - g.bloxDistDiv2) / g.bloxDist);
-      const ty = Math.trunc((touchy - g.bloxDistDiv2) / g.bloxDist);
+      const tx = Math.trunc((world.x - g.LEFT + g.bloxDistDiv2) / g.bloxDist);
+      const ty = Math.trunc((world.y - g.TOP + g.bloxDistDiv2) / g.bloxDist);
       if (tx >= 0 && tx < g.BLoxCntX && ty >= 0 && ty < g.BLoxCntY) {
         const tspot = g.field.field[tx][ty];
         for (let i = 0; i < tspot.length; i++) {
           const b = tspot[i];
           if (b.bloxType === BloxType.BOMB) {
-            const gx = x * (g.WIDTH / rect.width);
-            const gy = y * (g.HEIGHT / rect.height);
-            if (Math.abs(gx - b.pos.x) < g.bloxDistDiv2 && Math.abs(gy - b.pos.y) < g.bloxDistDiv2) {
+            if (Math.abs(world.x - b.pos.x) < g.bloxDistDiv2 && Math.abs(world.y - b.pos.y) < g.bloxDistDiv2) {
               g.physics.blowUpBlox(b);
             }
           }
