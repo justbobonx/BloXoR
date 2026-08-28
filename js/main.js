@@ -15,6 +15,8 @@ function resize() {
 }
 
 window.addEventListener('resize', resize);
+document.addEventListener('fullscreenchange', resize);
+document.addEventListener('webkitfullscreenchange', resize);
 window.addEventListener('pagehide', () => game.saveGame());
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'hidden') game.saveGame();
