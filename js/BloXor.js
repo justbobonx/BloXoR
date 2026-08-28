@@ -208,10 +208,7 @@ class BloXor {
   startFromWait(consumeAct) {
     if (this.gameState !== GameState.WaitToStartNewLevel) return;
     this.gameState = GameState.InPlay;
-    if (consumeAct) {
-      this.input.actHeld = true;
-      this.input.ignoreInteract = true;
-    }
+    this.input.absorbButtons();
   }
 
   beginInteract() {
@@ -237,6 +234,7 @@ class BloXor {
     this.waitingOnAct = true;
     this.downx = 0;
     this.downy = 0;
+    this.input.absorbButtons();
     return true;
   }
 
@@ -270,6 +268,7 @@ class BloXor {
     const b = this.curiaBlox;
     this.cancelInteract();
     if (b && b.bloxType === BloxType.BOMB) this.physics.blowUpBlox(b);
+    this.input.absorbButtons();
   }
 
   cancelInteract() {
@@ -286,6 +285,7 @@ class BloXor {
     this.loader.setupPuzzleI(i);
     this.ui.hideMenus();
     this.gameState = GameState.WaitToStartNewLevel;
+    this.input.absorbButtons();
     this.view.draw();
   }
 
@@ -296,10 +296,12 @@ class BloXor {
   backPressed() {
     if (this.ui.detailOpen()) {
       this.ui.closeDetail();
+      this.input.absorbButtons();
       return;
     }
     if (this.waitingOnAct) {
       this.cancelInteract();
+      this.input.absorbButtons();
       return;
     }
     if (this.ui.visible('pauseScreen')) {
@@ -315,6 +317,7 @@ class BloXor {
   resumePlay() {
     this.ui.hideMenus();
     this.gameState = GameState.InPlay;
+    this.input.absorbButtons();
   }
 
   setSoundMute(muted) {
@@ -532,6 +535,7 @@ class BloXorUI {
     document.getElementById('startScreen').classList.remove('hidden');
     this.focusIndex = 0;
     this.collectFocus();
+    this.g.input.absorbButtons();
   }
 
   hideMenus() {
@@ -574,6 +578,7 @@ class BloXorUI {
     document.getElementById('levelSelect').classList.remove('hidden');
     this.focusIndex = Math.max(0, Math.min(g.curPuzzleInd, g.levelData.length - 1));
     this.collectFocus();
+    g.input.absorbButtons();
   }
 
   showDetail(i) {
@@ -625,12 +630,14 @@ class BloXorUI {
     document.getElementById('levelDetail').classList.remove('hidden');
     this.focusIndex = ld.opened ? 1 : 0;
     this.collectFocus();
+    g.input.absorbButtons();
   }
 
   closeDetail() {
     document.getElementById('levelDetail').classList.add('hidden');
     this.focusIndex = this.g.curPuzzleInd;
     this.collectFocus();
+    this.g.input.absorbButtons();
   }
 
   detailOpen() {
@@ -643,6 +650,7 @@ class BloXorUI {
     document.getElementById('pauseScreen').classList.remove('hidden');
     this.focusIndex = 0;
     this.collectFocus();
+    this.g.input.absorbButtons();
   }
 
   showScore(cur, best) {
@@ -654,6 +662,7 @@ class BloXorUI {
     document.getElementById('scoreView').classList.remove('hidden');
     this.focusIndex = 0;
     this.collectFocus();
+    this.g.input.absorbButtons();
   }
 
   closeScore() {
