@@ -45,8 +45,10 @@ html, body {
 }
 
 #startTitle {
-  font-size: clamp(2.4rem, 10vw, 4rem);
-  letter-spacing: 0.08em;
+  display: block;
+  width: min(72%, 340px);
+  height: auto;
+  image-rendering: pixelated;
 }
 
 #startEmail {
