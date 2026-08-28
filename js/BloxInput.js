@@ -3,6 +3,7 @@ class BloxInput {
     this.g = game;
     this.keys = Object.create(null);
     this.pointerDown = false;
+    this.pointerDragged = false;
     this.dragOrigin = null;
     this.KEY_TILT = 0.12;
     this.KEY_TILT_HARD = 0.26;
@@ -95,6 +96,7 @@ class BloxInput {
 
     const onDown = (ev) => {
       this.pointerDown = true;
+      this.pointerDragged = false;
       const rect = canvas.getBoundingClientRect();
       this.dragOrigin = {
         x: ev.clientX - rect.left,
@@ -107,9 +109,10 @@ class BloxInput {
       this.handlePointer(ev, canvas, 'move');
     };
     const onUp = (ev) => {
-      this.pointerDown = false;
-      this.dragOrigin = null;
       this.handlePointer(ev, canvas, 'up');
+      this.pointerDown = false;
+      this.pointerDragged = false;
+      this.dragOrigin = null;
     };
 
     canvas.addEventListener('pointerdown', onDown);
@@ -197,10 +200,15 @@ class BloxInput {
 
   remapToScreen(gx, gy) {
     const a = ((this.screenAngle() % 360) + 360) % 360;
-    if (a === 90) return { x: gy, y: -gx };
-    if (a === 180) return { x: -gx, y: -gy };
-    if (a === 270) return { x: -gy, y: gx };
-    return { x: gx, y: gy };
+    let x = gx;
+    let y = gy;
+    if (a === 90) { x = gy; y = -gx; }
+    else if (a === 180) { x = -gx; y = -gy; }
+    else if (a === 270) { x = -gy; y = gx; }
+    const landscape = (a === 90 || a === 270);
+    if (landscape) x = -x;
+    else y = -y;
+    return { x, y };
   }
 
   applyTiltGs(accx, accy, accz) {
@@ -425,6 +433,23 @@ class BloxInput {
     g.updateMoveCnt();
   }
 
+  hitBombAt(world) {
+    const g = this.g;
+    const tx = Math.trunc((world.x - g.LEFT + g.bloxDistDiv2) / g.bloxDist);
+    const ty = Math.trunc((world.y - g.TOP + g.bloxDistDiv2) / g.bloxDist);
+    if (tx < 0 || tx >= g.BLoxCntX || ty < 0 || ty >= g.BLoxCntY) return null;
+    const tspot = g.field.field[tx][ty];
+    for (let i = 0; i < tspot.length; i++) {
+      const b = tspot[i];
+      if (b.bloxType === BloxType.BOMB &&
+          Math.abs(world.x - b.pos.x) < g.bloxDistDiv2 &&
+          Math.abs(world.y - b.pos.y) < g.bloxDistDiv2) {
+        return b;
+      }
+    }
+    return null;
+  }
+
   handlePointer(ev, canvas, phase) {
     const g = this.g;
     const rect = canvas.getBoundingClientRect();
@@ -441,49 +466,51 @@ class BloxInput {
       return;
     }
 
-    if (g.gameState === GameState.InPlay && phase === 'up') {
-      const tx = Math.trunc((world.x - g.LEFT + g.bloxDistDiv2) / g.bloxDist);
-      const ty = Math.trunc((world.y - g.TOP + g.bloxDistDiv2) / g.bloxDist);
-      if (tx >= 0 && tx < g.BLoxCntX && ty >= 0 && ty < g.BLoxCntY) {
-        const tspot = g.field.field[tx][ty];
-        for (let i = 0; i < tspot.length; i++) {
-          const b = tspot[i];
-          if (b.bloxType === BloxType.BOMB) {
-            if (Math.abs(world.x - b.pos.x) < g.bloxDistDiv2 && Math.abs(world.y - b.pos.y) < g.bloxDistDiv2) {
-              if (g.waitingOnAct) {
-                g.curiaBlox = b;
-                g.confirmInteract();
-              } else {
-                g.physics.blowUpBlox(b);
-              }
-            }
-          }
-        }
-      }
-    }
-
-    if (g.waitingOnAct) return;
-
     if (phase === 'move' || phase === 'down') {
       const ox = this.dragOrigin ? this.dragOrigin.x : rect.width * 0.5;
       const oy = this.dragOrigin ? this.dragOrigin.y : rect.height * 0.5;
       const dx = x - ox;
       const dy = y - oy;
       const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist < this.MOUSE_DEAD_PX) {
+      if (dist >= this.MOUSE_DEAD_PX) this.pointerDragged = true;
+      if (!g.waitingOnAct) {
+        if (dist < this.MOUSE_DEAD_PX) {
+          g.downx = 0;
+          g.downy = 0;
+        } else {
+          const reach = Math.min(1, (dist - this.MOUSE_DEAD_PX) / this.MOUSE_FULL_PX);
+          const scale = (this.MOUSE_MAX * reach) / dist;
+          g.downx = dx * scale;
+          g.downy = dy * scale;
+        }
+        g.updateMoveCnt();
+      }
+      return;
+    }
+
+    if (phase !== 'up') return;
+
+    if (g.gameState === GameState.InPlay) {
+      const bomb = this.hitBombAt(world);
+      if (bomb) {
+        if (g.waitingOnAct) {
+          g.curiaBlox = bomb;
+          g.confirmInteract();
+        } else {
+          g.physics.blowUpBlox(bomb);
+        }
         g.downx = 0;
         g.downy = 0;
-      } else {
-        const reach = Math.min(1, (dist - this.MOUSE_DEAD_PX) / this.MOUSE_FULL_PX);
-        const scale = (this.MOUSE_MAX * reach) / dist;
-        g.downx = dx * scale;
-        g.downy = dy * scale;
+        return;
       }
-      g.updateMoveCnt();
-    } else if (phase === 'up') {
-      g.downx = 0.0;
-      g.downy = 0.0;
-      this.applyKeys();
+      if (!this.pointerDragged && !g.waitingOnAct && !g.ui.menuOpen()) {
+        g.backPressed();
+        return;
+      }
     }
+
+    g.downx = 0.0;
+    g.downy = 0.0;
+    this.applyKeys();
   }
 }
