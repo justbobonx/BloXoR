@@ -5,6 +5,9 @@ class BloxInput {
     this.pointerDown = false;
     this.pointerDragged = false;
     this.dragOrigin = null;
+    this.holdTimer = 0;
+    this.holdWorld = null;
+    this.LONG_PRESS_MS = 550;
     this.KEY_TILT = 0.12;
     this.KEY_TILT_HARD = 0.26;
     this.MOUSE_MAX = 0.25;
@@ -20,6 +23,8 @@ class BloxInput {
     this.actHeld = false;
     this.ignoreInteract = false;
     this.iaDirHeld = '';
+    this.wakeLock = null;
+    this.wakeBusy = false;
 
     this.tiltAttached = false;
     this.tiltDenied = false;
@@ -93,6 +98,8 @@ class BloxInput {
     });
 
     document.addEventListener('pointerdown', () => { this.enableTilt(); }, true);
+    document.addEventListener('visibilitychange', () => this.syncWakeLock());
+    canvas.addEventListener('contextmenu', (e) => e.preventDefault());
 
     const onDown = (ev) => {
       this.pointerDown = true;
@@ -113,12 +120,69 @@ class BloxInput {
       this.pointerDown = false;
       this.pointerDragged = false;
       this.dragOrigin = null;
+      this.clearHold();
     };
 
     canvas.addEventListener('pointerdown', onDown);
     window.addEventListener('pointermove', onMove);
     window.addEventListener('pointerup', onUp);
     window.addEventListener('pointercancel', onUp);
+  }
+
+  playingForWake() {
+    const g = this.g;
+    if (g.ui.menuOpen()) return false;
+    if (document.visibilityState === 'hidden') return false;
+    return g.gameState === GameState.InPlay || g.gameState === GameState.WaitToStartNewLevel;
+  }
+
+  syncWakeLock() {
+    if (this.playingForWake()) this.requestWakeLock();
+    else this.releaseWakeLock();
+  }
+
+  requestWakeLock() {
+    if (this.wakeLock || this.wakeBusy) return;
+    if (!navigator.wakeLock || typeof navigator.wakeLock.request !== 'function') return;
+    this.wakeBusy = true;
+    navigator.wakeLock.request('screen').then((lock) => {
+      this.wakeBusy = false;
+      this.wakeLock = lock;
+      lock.addEventListener('release', () => { this.wakeLock = null; });
+    }).catch(() => {
+      this.wakeBusy = false;
+      this.wakeLock = null;
+    });
+  }
+
+  releaseWakeLock() {
+    const lock = this.wakeLock;
+    this.wakeLock = null;
+    if (lock && typeof lock.release === 'function') {
+      try { lock.release(); } catch (err) {}
+    }
+  }
+
+  clearHold() {
+    if (this.holdTimer) {
+      clearTimeout(this.holdTimer);
+      this.holdTimer = 0;
+    }
+    this.holdWorld = null;
+  }
+
+  startHold(world) {
+    this.clearHold();
+    const g = this.g;
+    if (g.gameState !== GameState.InPlay || g.waitingOnAct || g.ui.menuOpen()) return;
+    if (this.hitBombAt(world)) return;
+    this.holdWorld = world;
+    this.holdTimer = setTimeout(() => {
+      this.holdTimer = 0;
+      if (!this.pointerDown || this.pointerDragged) return;
+      if (g.gameState !== GameState.InPlay || g.waitingOnAct || g.ui.menuOpen()) return;
+      g.backPressed();
+    }, this.LONG_PRESS_MS);
   }
 
   toWorld(ev, canvas) {
@@ -264,6 +328,7 @@ class BloxInput {
   }
 
   poll() {
+    this.syncWakeLock();
     if (this.g.ui.menuOpen()) {
       this.g.downx = 0;
       this.g.downy = 0;
@@ -466,13 +531,20 @@ class BloxInput {
       return;
     }
 
+    if (phase === 'down') {
+      this.startHold(world);
+    }
+
     if (phase === 'move' || phase === 'down') {
       const ox = this.dragOrigin ? this.dragOrigin.x : rect.width * 0.5;
       const oy = this.dragOrigin ? this.dragOrigin.y : rect.height * 0.5;
       const dx = x - ox;
       const dy = y - oy;
       const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist >= this.MOUSE_DEAD_PX) this.pointerDragged = true;
+      if (dist >= this.MOUSE_DEAD_PX) {
+        this.pointerDragged = true;
+        this.clearHold();
+      }
       if (!g.waitingOnAct) {
         if (dist < this.MOUSE_DEAD_PX) {
           g.downx = 0;
@@ -489,6 +561,7 @@ class BloxInput {
     }
 
     if (phase !== 'up') return;
+    this.clearHold();
 
     if (g.gameState === GameState.InPlay) {
       const bomb = this.hitBombAt(world);
@@ -501,10 +574,6 @@ class BloxInput {
         }
         g.downx = 0;
         g.downy = 0;
-        return;
-      }
-      if (!this.pointerDragged && !g.waitingOnAct && !g.ui.menuOpen()) {
-        g.backPressed();
         return;
       }
     }
