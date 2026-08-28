@@ -6,10 +6,10 @@ class BloxInput {
     this.dragOrigin = null;
     this.KEY_TILT = 0.12;
     this.KEY_TILT_HARD = 0.26;
-    this.MOUSE_MAX = 0.22;
+    this.MOUSE_MAX = 0.25;
     this.MOUSE_DEAD_PX = 10;
     this.MOUSE_FULL_PX = 90;
-    this.joyLev = 0.30;
+    this.joyLev = 0.20;
     this.joyPow = 0.12;
     this.MENU_STICK = 0.55;
     this.padIndex = -1;
