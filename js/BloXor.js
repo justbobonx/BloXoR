@@ -88,6 +88,12 @@ class BloXor {
     this.alignBg = null;
     this.alignArrow = null;
 
+    this.waitingOnAct = false;
+    this.iaBloxs = [];
+    this.curiaBlox = null;
+    this.iaHilite = null;
+    this.lastIaPos = new Coord(240, 160);
+
     this.gameState = GameState.NoDraw;
     this.pauseGameState = null;
     this.initialized = false;
@@ -133,9 +139,11 @@ class BloXor {
 
   update() {
     this.input.poll();
-    if (this.gameState === GameState.InPlay) {
+    if (this.gameState === GameState.InPlay && !this.waitingOnAct) {
       this.updateTimer();
       this.physics.updateBlox();
+      this.ui.refreshPlayHud();
+    } else if (this.gameState === GameState.InPlay && this.waitingOnAct) {
       this.ui.refreshPlayHud();
     }
   }
@@ -149,7 +157,7 @@ class BloXor {
   }
 
   updateMoveCnt() {
-    if (this.gameState !== GameState.InPlay) return;
+    if (this.gameState !== GameState.InPlay || this.waitingOnAct) return;
     const newAccX = Math.abs(this.downx) < (this.lastAccX === 0 ? this.FLAT_SPAN : 0.01) ? 0 : Math.sign(this.downx);
     const newAccY = Math.abs(this.downy) < (this.lastAccY === 0 ? this.FLAT_SPAN : 0.01) ? 0 : Math.sign(this.downy);
     if ((newAccX !== this.lastAccX && newAccX !== 0) || (newAccY !== this.lastAccY && newAccY !== 0)) {
@@ -185,9 +193,85 @@ class BloXor {
     this.input.enableTilt();
   }
 
+  collectInteractBloxs() {
+    const list = [];
+    const add = (arr) => {
+      for (let i = 0; i < arr.length; i++) {
+        if (arr[i].bloxType === BloxType.BOMB) list.push(arr[i]);
+      }
+    };
+    add(this.surfaceBloxs);
+    add(this.moverBloxs);
+    return list;
+  }
+
+  beginInteract() {
+    if (this.gameState !== GameState.InPlay || this.waitingOnAct) return false;
+    const list = this.collectInteractBloxs();
+    if (list.length === 0) return false;
+    this.iaBloxs = list;
+    let best = list[0];
+    let bestDist = 999999;
+    for (let i = 0; i < list.length; i++) {
+      const b = list[i];
+      const dx = b.pos.x - this.lastIaPos.x;
+      const dy = b.pos.y - this.lastIaPos.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < bestDist) {
+        bestDist = dist;
+        best = b;
+      }
+    }
+    this.curiaBlox = best;
+    this.lastIaPos = new Coord(best.pos);
+    this.waitingOnAct = true;
+    this.downx = 0;
+    this.downy = 0;
+    return true;
+  }
+
+  stepInteract(dir) {
+    const cur = this.curiaBlox;
+    if (!cur) return;
+    let found = null;
+    let founddist = 999999;
+    for (let i = 0; i < this.iaBloxs.length; i++) {
+      const tb = this.iaBloxs[i];
+      if (tb === cur) continue;
+      if (dir === 'down' && tb.pos.y <= cur.pos.y) continue;
+      if (dir === 'up' && tb.pos.y >= cur.pos.y) continue;
+      if (dir === 'left' && tb.pos.x >= cur.pos.x) continue;
+      if (dir === 'right' && tb.pos.x <= cur.pos.x) continue;
+      const dx = tb.pos.x - cur.pos.x;
+      const dy = tb.pos.y - cur.pos.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < founddist) {
+        founddist = dist;
+        found = tb;
+      }
+    }
+    if (found) {
+      this.curiaBlox = found;
+      this.lastIaPos = new Coord(found.pos);
+    }
+  }
+
+  confirmInteract() {
+    const b = this.curiaBlox;
+    this.cancelInteract();
+    if (b && b.bloxType === BloxType.BOMB) this.physics.blowUpBlox(b);
+  }
+
+  cancelInteract() {
+    this.waitingOnAct = false;
+    this.iaBloxs = [];
+    this.curiaBlox = null;
+  }
+
   playLevel(i) {
     const ld = this.levelData[i];
     if (!ld || !ld.opened) return;
+    this.cancelInteract();
     this.curPuzzleInd = i;
     this.loader.setupPuzzleI(i);
     this.ui.hideMenus();
@@ -202,6 +286,10 @@ class BloXor {
   backPressed() {
     if (this.ui.detailOpen()) {
       this.ui.closeDetail();
+      return;
+    }
+    if (this.waitingOnAct) {
+      this.cancelInteract();
       return;
     }
     if (this.gameState === GameState.InPlay || this.gameState === GameState.WaitToStartNewLevel) {
@@ -223,6 +311,7 @@ class BloXor {
   }
 
   levelCompeted() {
+    this.cancelInteract();
     this.gameState = GameState.LevelBeat;
     this.soundManager.stopSound('sfx_slide');
 
@@ -441,6 +530,7 @@ class BloXorUI {
 
   showLevelSelect() {
     const g = this.g;
+    g.cancelInteract();
     g.gameState = GameState.NoDraw;
     this.hideMenus();
     document.getElementById('ls_tot').textContent = String(g.totScore);
@@ -534,6 +624,7 @@ class BloXorUI {
   }
 
   showPause() {
+    this.g.cancelInteract();
     this.hideMenus();
     document.getElementById('pauseScreen').classList.remove('hidden');
     this.focusIndex = 0;
