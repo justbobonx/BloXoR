@@ -305,9 +305,10 @@ class BloxInput {
   pollStart() {
     if (this.g.ui.menuOpen()) return;
     const pad = this.currentPad();
-    const start = pad && pad.buttons && pad.buttons[9] && pad.buttons[9].pressed;
-    if (start && !this.startHeld) this.g.backPressed();
-    this.startHeld = !!start;
+    const btn = (i) => !!(pad && pad.buttons && pad.buttons[i] && pad.buttons[i].pressed);
+    const pauseHeld = btn(9) || btn(1);
+    if (pauseHeld && !this.startHeld) this.g.backPressed();
+    this.startHeld = pauseHeld;
   }
 
   applyKeys() {
