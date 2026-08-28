@@ -162,6 +162,28 @@ class BloXor {
     if (this.gameState !== GameState.NoDraw) this.view.draw();
   }
 
+  isFullscreen() {
+    return !!(document.fullscreenElement || document.webkitFullscreenElement);
+  }
+
+  // Title stays windowed. PLAY / CONTINUE is a user gesture, so FS is legal here.
+  // Target the container, not the canvas — menus live outside the canvas.
+  enterPlayFullscreen() {
+    if (this.isFullscreen()) return;
+    const el = document.getElementById('game-container') || this.canvas;
+    const req = el.requestFullscreen || el.webkitRequestFullscreen || el.webkitRequestFullScreen;
+    if (!req) return;
+    try {
+      const p = req.call(el);
+      if (p && typeof p.catch === 'function') {
+        p.catch((err) => console.warn('Fullscreen request failed', err));
+      }
+    } catch (err) {
+      console.warn('Fullscreen request failed', err);
+    }
+    this.input.enableTilt();
+  }
+
   playLevel(i) {
     const ld = this.levelData[i];
     if (!ld || !ld.opened) return;
@@ -276,10 +298,12 @@ class BloXorUI {
   bind() {
     const g = this.g;
     document.getElementById('newGameButton').addEventListener('click', () => {
+      g.enterPlayFullscreen();
       document.getElementById('startScreen').classList.add('hidden');
       this.showLevelSelect();
     });
     document.getElementById('continueButton').addEventListener('click', () => {
+      g.enterPlayFullscreen();
       document.getElementById('startScreen').classList.add('hidden');
       this.showLevelSelect();
     });
