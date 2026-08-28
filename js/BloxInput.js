@@ -16,6 +16,19 @@ class BloxInput {
     this.startHeld = false;
     this.aHeld = false;
     this.bHeld = false;
+
+    this.tiltAttached = false;
+    this.tiltDenied = false;
+    this.tiltBusy = false;
+    this.lastTiltAt = 0;
+    this.lastdx = 0;
+    this.lastdy = 0;
+    this.lastdz = 0;
+    this.lastdx2 = 0;
+    this.lastdy2 = 0;
+    this.lastdz2 = 0;
+    this.onMotion = (e) => this.handleMotion(e);
+    this.onOrient = (e) => this.handleOrientation(e);
   }
 
   attach(canvas) {
@@ -45,6 +58,8 @@ class BloxInput {
       if (this.padIndex === e.gamepad.index) this.padIndex = -1;
     });
 
+    document.addEventListener('pointerdown', () => { this.enableTilt(); }, true);
+
     const onDown = (ev) => {
       this.pointerDown = true;
       const rect = canvas.getBoundingClientRect();
@@ -70,6 +85,126 @@ class BloxInput {
     window.addEventListener('pointercancel', onUp);
   }
 
+  enableTilt() {
+    if (this.tiltAttached || this.tiltDenied || this.tiltBusy) return;
+    this.tiltBusy = true;
+    const finish = (ok) => {
+      this.tiltBusy = false;
+      if (!ok) {
+        this.tiltDenied = true;
+        return;
+      }
+      this.attachMotion();
+    };
+
+    const motionNeed = window.DeviceMotionEvent && typeof DeviceMotionEvent.requestPermission === 'function';
+    const orientNeed = window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission === 'function';
+    if (!motionNeed && !orientNeed) {
+      finish(true);
+      return;
+    }
+
+    const ask = (Ctor) => {
+      if (!Ctor || typeof Ctor.requestPermission !== 'function') return Promise.resolve('granted');
+      return Ctor.requestPermission().catch(() => 'denied');
+    };
+
+    ask(window.DeviceMotionEvent).then((motionState) => {
+      if (motionState === 'granted') {
+        finish(true);
+        return;
+      }
+      return ask(window.DeviceOrientationEvent).then((orientState) => {
+        finish(orientState === 'granted');
+      });
+    });
+  }
+
+  attachMotion() {
+    if (this.tiltAttached) return;
+    this.tiltAttached = true;
+    window.addEventListener('devicemotion', this.onMotion, true);
+    window.addEventListener('deviceorientation', this.onOrient, true);
+  }
+
+  tiltLive() {
+    return this.lastTiltAt > 0 && (Date.now() - this.lastTiltAt) < 400;
+  }
+
+  usingManual() {
+    return this.pointerDown || this.anyDirKey() || !!this.readStick();
+  }
+
+  anyDirKey() {
+    return !!(this.keys.ArrowLeft || this.keys.ArrowRight || this.keys.ArrowUp || this.keys.ArrowDown ||
+      this.keys.KeyA || this.keys.KeyD || this.keys.KeyW || this.keys.KeyS);
+  }
+
+  screenAngle() {
+    if (screen.orientation && typeof screen.orientation.angle === 'number') return screen.orientation.angle;
+    if (typeof window.orientation === 'number') return window.orientation;
+    return window.innerWidth > window.innerHeight ? 90 : 0;
+  }
+
+  remapToScreen(gx, gy) {
+    const a = ((this.screenAngle() % 360) + 360) % 360;
+    if (a === 90) return { x: gy, y: -gx };
+    if (a === 180) return { x: -gx, y: -gy };
+    if (a === 270) return { x: -gy, y: gx };
+    return { x: gx, y: gy };
+  }
+
+  applyTiltGs(accx, accy, accz) {
+    const g = this.g;
+    if (g.ui.menuOpen() || this.usingManual()) return;
+
+    let downx = (accx + this.lastdx + this.lastdx2) / 3;
+    let downy = (accy + this.lastdy + this.lastdy2) / 3;
+    let downz = (accz + this.lastdz + this.lastdz2) / 3;
+
+    accx = Math.max(-1, Math.min(1, accx));
+    accy = Math.max(-1, Math.min(1, accy));
+    accz = Math.max(-1, Math.min(1, accz));
+
+    const span = g.FLAT_SPAN;
+    const start = g.FLAT_START;
+    if (Math.abs(downx) < span) downx = 0;
+    else if (downx > 0) downx -= start;
+    else downx += start;
+    if (Math.abs(downy) < span) downy = 0;
+    else if (downy > 0) downy -= start;
+    else downy += start;
+
+    this.lastdx2 = this.lastdx;
+    this.lastdy2 = this.lastdy;
+    this.lastdz2 = this.lastdz;
+    this.lastdx = accx;
+    this.lastdy = accy;
+    this.lastdz = accz;
+
+    g.downx = downx;
+    g.downy = downy;
+    g.downz = downz;
+    this.lastTiltAt = Date.now();
+    g.updateMoveCnt();
+  }
+
+  handleMotion(e) {
+    const a = e.accelerationIncludingGravity;
+    if (!a || a.x == null || a.y == null) return;
+    const mapped = this.remapToScreen(a.x / 9.81, a.y / 9.81);
+    const accz = (a.z == null ? 0 : a.z) / 9.81;
+    this.applyTiltGs(mapped.x, mapped.y, accz);
+  }
+
+  handleOrientation(e) {
+    if (this.tiltLive() && this.lastMotionWasGravity) return;
+    if (e.gamma == null || e.beta == null) return;
+    const mapped = this.remapToScreen(e.gamma / 45, e.beta / 45);
+    const accz = 1 - Math.min(1, Math.sqrt(mapped.x * mapped.x + mapped.y * mapped.y));
+    this.applyTiltGs(mapped.x, mapped.y, accz);
+  }
+
   poll() {
     if (this.g.ui.menuOpen()) {
       this.g.downx = 0;
@@ -82,9 +217,19 @@ class BloxInput {
       this.g.downx = stick.x;
       this.g.downy = stick.y;
       this.g.updateMoveCnt();
-    } else {
-      this.applyKeys();
+      this.pollStart();
+      return;
     }
+    if (this.anyDirKey()) {
+      this.applyKeys();
+      this.pollStart();
+      return;
+    }
+    if (this.tiltLive()) {
+      this.pollStart();
+      return;
+    }
+    this.applyKeys();
     this.pollStart();
   }
 
