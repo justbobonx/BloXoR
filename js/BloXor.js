@@ -118,7 +118,10 @@ class BloXor {
   startLoop() {
     if (this.loopTimer) clearInterval(this.loopTimer);
     this.loopTimer = setInterval(() => {
-      if (this.gameState !== GameState.NoDraw) {
+      if (this.ui.menuOpen()) {
+        this.input.poll();
+        this.ui.navTick();
+      } else if (this.gameState !== GameState.NoDraw) {
         this.update();
         this.view.draw();
       }
@@ -264,6 +267,10 @@ class BloXor {
 class BloXorUI {
   constructor(game) {
     this.g = game;
+    this.focusEls = [];
+    this.focusIndex = 0;
+    this.heldDir = 0;
+    this.repeatAt = 0;
   }
 
   bind() {
@@ -291,6 +298,102 @@ class BloXorUI {
     });
   }
 
+  menuOpen() {
+    return !!this.menuLayer();
+  }
+
+  menuLayer() {
+    if (this.visible('startScreen')) return 'start';
+    if (this.visible('levelDetail')) return 'detail';
+    if (this.visible('levelSelect')) return 'select';
+    if (this.visible('pauseScreen')) return 'pause';
+    if (this.visible('scoreView')) return 'score';
+    return null;
+  }
+
+  visible(id) {
+    const el = document.getElementById(id);
+    return el && !el.classList.contains('hidden');
+  }
+
+  collectFocus() {
+    const layer = this.menuLayer();
+    let ids = [];
+    if (layer === 'start') ids = ['newGameButton', 'continueButton'];
+    else if (layer === 'select') {
+      this.focusEls = Array.prototype.slice.call(document.querySelectorAll('#ls_list .ls-row'));
+      const mute = document.getElementById('sb_mute');
+      if (mute) this.focusEls.push(mute);
+      this.clampFocus();
+      this.paintFocus();
+      return;
+    } else if (layer === 'detail') ids = ['ld_back', 'ld_play'];
+    else if (layer === 'pause') ids = ['ps_resume', 'ps_restart', 'ps_menu'];
+    else if (layer === 'score') ids = ['sc_ok'];
+    this.focusEls = ids.map((id) => document.getElementById(id)).filter((el) => el && !el.classList.contains('hidden') && !el.disabled);
+    this.clampFocus();
+    this.paintFocus();
+  }
+
+  clampFocus() {
+    if (this.focusEls.length === 0) {
+      this.focusIndex = 0;
+      return;
+    }
+    if (this.focusIndex < 0) this.focusIndex = this.focusEls.length - 1;
+    if (this.focusIndex >= this.focusEls.length) this.focusIndex = 0;
+  }
+
+  paintFocus() {
+    const all = document.querySelectorAll('.ui-focus');
+    for (let i = 0; i < all.length; i++) all[i].classList.remove('ui-focus');
+    const el = this.focusEls[this.focusIndex];
+    if (!el) return;
+    el.classList.add('ui-focus');
+    if (el.scrollIntoView) el.scrollIntoView({ block: 'nearest' });
+  }
+
+  setFocus(i) {
+    this.focusIndex = i;
+    this.clampFocus();
+    this.paintFocus();
+  }
+
+  navTick() {
+    this.collectFocus();
+    const nav = this.g.input.menuButtons();
+    if (nav.back) {
+      this.g.backPressed();
+      return;
+    }
+    if (nav.activate) {
+      this.activateFocus();
+      return;
+    }
+    let dir = 0;
+    if (nav.down || nav.right) dir = 1;
+    else if (nav.up || nav.left) dir = -1;
+    const now = Date.now();
+    if (dir === 0) {
+      this.heldDir = 0;
+      this.repeatAt = 0;
+      return;
+    }
+    if (dir !== this.heldDir) {
+      this.heldDir = dir;
+      this.repeatAt = now + 280;
+      this.setFocus(this.focusIndex + dir);
+    } else if (now >= this.repeatAt) {
+      this.repeatAt = now + 70;
+      this.setFocus(this.focusIndex + dir);
+    }
+  }
+
+  activateFocus() {
+    const el = this.focusEls[this.focusIndex];
+    if (el && !el.disabled) el.click();
+  }
+
   showStart() {
     const cont = document.getElementById('continueButton');
     const hasProgress = this.g.lvlsBeat > 0 || this.g.levelData.some((l) => l.playCount > 0);
@@ -299,6 +402,8 @@ class BloXorUI {
     document.getElementById('startScreen').classList.remove('hidden');
     this.hideMenus();
     document.getElementById('startScreen').classList.remove('hidden');
+    this.focusIndex = 0;
+    this.collectFocus();
   }
 
   hideMenus() {
@@ -338,6 +443,8 @@ class BloXorUI {
       list.appendChild(row);
     }
     document.getElementById('levelSelect').classList.remove('hidden');
+    this.focusIndex = Math.max(0, Math.min(g.curPuzzleInd, g.levelData.length - 1));
+    this.collectFocus();
   }
 
   showDetail(i) {
@@ -387,19 +494,25 @@ class BloXorUI {
     }
 
     document.getElementById('levelDetail').classList.remove('hidden');
+    this.focusIndex = ld.opened ? 1 : 0;
+    this.collectFocus();
   }
 
   closeDetail() {
     document.getElementById('levelDetail').classList.add('hidden');
+    this.focusIndex = this.g.curPuzzleInd;
+    this.collectFocus();
   }
 
   detailOpen() {
-    return !document.getElementById('levelDetail').classList.contains('hidden');
+    return this.visible('levelDetail');
   }
 
   showPause() {
     this.hideMenus();
     document.getElementById('pauseScreen').classList.remove('hidden');
+    this.focusIndex = 0;
+    this.collectFocus();
   }
 
   showScore(cur, best) {
@@ -409,6 +522,8 @@ class BloXorUI {
       'Time: ' + Math.floor(cur.seconds / 60) + ':' + String(Math.floor(cur.seconds % 60 + 0.5)).padStart(2, '0');
     document.getElementById('sc_moves').textContent = 'Tilts: ' + cur.moves;
     document.getElementById('scoreView').classList.remove('hidden');
+    this.focusIndex = 0;
+    this.collectFocus();
   }
 
   closeScore() {
