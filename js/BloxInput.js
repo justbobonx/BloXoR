@@ -21,6 +21,7 @@ class BloxInput {
     this.tiltDenied = false;
     this.tiltBusy = false;
     this.lastTiltAt = 0;
+    this.lastMotionWasGravity = false;
     this.lastdx = 0;
     this.lastdy = 0;
     this.lastdz = 0;
@@ -192,13 +193,14 @@ class BloxInput {
   handleMotion(e) {
     const a = e.accelerationIncludingGravity;
     if (!a || a.x == null || a.y == null) return;
+    this.lastMotionWasGravity = true;
     const mapped = this.remapToScreen(a.x / 9.81, a.y / 9.81);
     const accz = (a.z == null ? 0 : a.z) / 9.81;
     this.applyTiltGs(mapped.x, mapped.y, accz);
   }
 
   handleOrientation(e) {
-    if (this.tiltLive() && this.lastMotionWasGravity) return;
+    if (this.lastMotionWasGravity) return;
     if (e.gamma == null || e.beta == null) return;
     const mapped = this.remapToScreen(e.gamma / 45, e.beta / 45);
     const accz = 1 - Math.min(1, Math.sqrt(mapped.x * mapped.x + mapped.y * mapped.y));
