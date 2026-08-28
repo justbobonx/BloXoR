@@ -205,9 +205,8 @@ class BloxInput {
     if (a === 90) { x = gy; y = -gx; }
     else if (a === 180) { x = -gx; y = -gy; }
     else if (a === 270) { x = -gy; y = gx; }
-    const landscape = (a === 90 || a === 270);
-    if (landscape) x = -x;
-    else y = -y;
+    x = -x;
+    y = -y;
     return { x, y };
   }
 
