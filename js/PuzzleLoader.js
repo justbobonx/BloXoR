@@ -46,7 +46,7 @@ class PuzzleLoader {
 
       const aBlox = new Blox(newBloxType);
       aBlox.setPos(new Coord(g.LEFT + x * g.bloxDist, g.TOP + y * g.bloxDist));
-      aBlox.curGState.scale = g.theScale;
+      aBlox.curGState.scale = 1;
 
       let boltIt = false;
       if (params.length > 3 && params[3] === 'bolts') boltIt = true;
@@ -62,28 +62,28 @@ class PuzzleLoader {
         g.field.addBloxToField(aBlox, g.field.field[x][y]);
         const bgBlox = new Blox('1W_L_BG');
         bgBlox.setPos(new Coord(g.LEFT + x * g.bloxDist, g.TOP + y * g.bloxDist));
-        bgBlox.curGState.scale = g.theScale;
+        bgBlox.curGState.scale = 1;
         g.underBloxs.push(bgBlox);
       } else if (aBlox.bloxType === BloxType.OW_R) {
         g.overBloxs.push(aBlox);
         g.field.addBloxToField(aBlox, g.field.field[x][y]);
         const bgBlox = new Blox('1W_R_BG');
         bgBlox.setPos(new Coord(g.LEFT + x * g.bloxDist, g.TOP + y * g.bloxDist));
-        bgBlox.curGState.scale = g.theScale;
+        bgBlox.curGState.scale = 1;
         g.underBloxs.push(bgBlox);
       } else if (aBlox.bloxType === BloxType.OW_U) {
         g.overBloxs.push(aBlox);
         g.field.addBloxToField(aBlox, g.field.field[x][y]);
         const bgBlox = new Blox('1W_U_BG');
         bgBlox.setPos(new Coord(g.LEFT + x * g.bloxDist, g.TOP + y * g.bloxDist));
-        bgBlox.curGState.scale = g.theScale;
+        bgBlox.curGState.scale = 1;
         g.underBloxs.push(bgBlox);
       } else if (aBlox.bloxType === BloxType.OW_D) {
         g.overBloxs.push(aBlox);
         g.field.addBloxToField(aBlox, g.field.field[x][y]);
         const bgBlox = new Blox('1W_D_BG');
         bgBlox.setPos(new Coord(g.LEFT + x * g.bloxDist, g.TOP + y * g.bloxDist));
-        bgBlox.curGState.scale = g.theScale;
+        bgBlox.curGState.scale = 1;
         g.underBloxs.push(bgBlox);
       } else {
         g.surfaceBloxs.push(aBlox);
@@ -91,7 +91,7 @@ class PuzzleLoader {
         if (boltIt) {
           const bgBlox = new Blox('Bolts');
           bgBlox.setPos(new Coord(g.LEFT + x * g.bloxDist, g.TOP + y * g.bloxDist));
-          bgBlox.curGState.scale = g.theScale;
+          bgBlox.curGState.scale = 1;
           aBlox.bolted = bgBlox;
           g.overBloxs.push(bgBlox);
         } else {
