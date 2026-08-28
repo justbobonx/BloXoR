@@ -34,16 +34,19 @@ class BloXor {
     this.NUM_LEVELS_ALLOW_OPEN = 6;
 
     this.theScale = 1;
+    this.viewScale = 1;
+    this.viewOx = 0;
+    this.viewOy = 0;
     this.TOUCH_TOP = 0;
     this.TOUCH_LEFT = 0;
     this.TOP = 40;
-    this.BOTTOM = 800;
+    this.BOTTOM = 280;
     this.LEFT = 40;
-    this.RIGHT = 800;
-    this.WIDTH = 800;
-    this.HEIGHT = 480;
-    this.CENTER_X = 400;
-    this.CENTER_Y = 240;
+    this.RIGHT = 440;
+    this.WIDTH = 480;
+    this.HEIGHT = 320;
+    this.CENTER_X = 240;
+    this.CENTER_Y = 160;
 
     this.updateCounter = 0;
     this.downx = 0;
@@ -166,8 +169,6 @@ class BloXor {
     return !!(document.fullscreenElement || document.webkitFullscreenElement);
   }
 
-  // Title stays windowed. PLAY / CONTINUE is a user gesture, so FS is legal here.
-  // Target the container, not the canvas — menus live outside the canvas.
   enterPlayFullscreen() {
     if (this.isFullscreen()) return;
     const el = document.getElementById('game-container') || this.canvas;
@@ -349,14 +350,14 @@ class BloXorUI {
       const mute = document.getElementById('sb_mute');
       if (mute) this.focusEls.push(mute);
       this.clampFocus();
-      this.paintFocus();
+      this.paintFocus(false);
       return;
     } else if (layer === 'detail') ids = ['ld_back', 'ld_play'];
     else if (layer === 'pause') ids = ['ps_resume', 'ps_restart', 'ps_menu'];
     else if (layer === 'score') ids = ['sc_ok'];
     this.focusEls = ids.map((id) => document.getElementById(id)).filter((el) => el && !el.classList.contains('hidden') && !el.disabled);
     this.clampFocus();
-    this.paintFocus();
+    this.paintFocus(false);
   }
 
   clampFocus() {
@@ -368,19 +369,19 @@ class BloXorUI {
     if (this.focusIndex >= this.focusEls.length) this.focusIndex = 0;
   }
 
-  paintFocus() {
+  paintFocus(keepInView) {
     const all = document.querySelectorAll('.ui-focus');
     for (let i = 0; i < all.length; i++) all[i].classList.remove('ui-focus');
     const el = this.focusEls[this.focusIndex];
     if (!el) return;
     el.classList.add('ui-focus');
-    if (el.scrollIntoView) el.scrollIntoView({ block: 'nearest' });
+    if (keepInView && el.scrollIntoView) el.scrollIntoView({ block: 'nearest' });
   }
 
-  setFocus(i) {
+  setFocus(i, keepInView) {
     this.focusIndex = i;
     this.clampFocus();
-    this.paintFocus();
+    this.paintFocus(!!keepInView);
   }
 
   navTick() {
@@ -406,10 +407,10 @@ class BloXorUI {
     if (dir !== this.heldDir) {
       this.heldDir = dir;
       this.repeatAt = now + 280;
-      this.setFocus(this.focusIndex + dir);
+      this.setFocus(this.focusIndex + dir, true);
     } else if (now >= this.repeatAt) {
       this.repeatAt = now + 70;
-      this.setFocus(this.focusIndex + dir);
+      this.setFocus(this.focusIndex + dir, true);
     }
   }
 
