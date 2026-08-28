@@ -16,6 +16,8 @@ class BloxInput {
     this.startHeld = false;
     this.aHeld = false;
     this.bHeld = false;
+    this.actHeld = false;
+    this.iaDirHeld = '';
 
     this.tiltAttached = false;
     this.tiltDenied = false;
@@ -45,11 +47,16 @@ class BloxInput {
         g.backPressed();
         return;
       }
-      if (!g.ui.menuOpen()) this.applyKeys();
+      if (e.code === 'Space' && g.gameState === GameState.InPlay && !g.ui.menuOpen()) {
+        if (g.waitingOnAct) g.confirmInteract();
+        else g.beginInteract();
+        return;
+      }
+      if (!g.ui.menuOpen() && !g.waitingOnAct) this.applyKeys();
     });
     window.addEventListener('keyup', (e) => {
       this.keys[e.code] = false;
-      if (!g.ui.menuOpen()) this.applyKeys();
+      if (!g.ui.menuOpen() && !g.waitingOnAct) this.applyKeys();
     });
 
     window.addEventListener('gamepadconnected', (e) => {
@@ -173,7 +180,7 @@ class BloxInput {
 
   applyTiltGs(accx, accy, accz) {
     const g = this.g;
-    if (g.ui.menuOpen() || this.usingManual()) return;
+    if (g.ui.menuOpen() || g.waitingOnAct || this.usingManual()) return;
 
     let downx = (accx + this.lastdx + this.lastdx2) / 3;
     let downy = (accy + this.lastdy + this.lastdy2) / 3;
@@ -229,26 +236,74 @@ class BloxInput {
       this.g.downy = 0;
       return;
     }
-    if (this.pointerDown) return;
+    if (this.g.waitingOnAct) {
+      this.g.downx = 0;
+      this.g.downy = 0;
+      this.pollInteractMove();
+      this.pollAct();
+      this.pollStart();
+      return;
+    }
+    if (this.pointerDown) {
+      this.pollAct();
+      this.pollStart();
+      return;
+    }
     const stick = this.readStick();
     if (stick) {
       this.g.downx = stick.x;
       this.g.downy = stick.y;
       this.g.updateMoveCnt();
+      this.pollAct();
       this.pollStart();
       return;
     }
     if (this.anyDirKey()) {
       this.applyKeys();
+      this.pollAct();
       this.pollStart();
       return;
     }
     if (this.tiltLive()) {
+      this.pollAct();
       this.pollStart();
       return;
     }
     this.applyKeys();
+    this.pollAct();
     this.pollStart();
+  }
+
+  pollAct() {
+    if (this.g.gameState !== GameState.InPlay) {
+      this.actHeld = this.actDown();
+      return;
+    }
+    const held = this.actDown();
+    if (held && !this.actHeld) {
+      if (this.g.waitingOnAct) this.g.confirmInteract();
+      else this.g.beginInteract();
+    }
+    this.actHeld = held;
+  }
+
+  actDown() {
+    const pad = this.currentPad();
+    const btnA = !!(pad && pad.buttons && pad.buttons[0] && pad.buttons[0].pressed);
+    return !!(this.keys.Space || btnA);
+  }
+
+  pollInteractMove() {
+    const pad = this.currentPad();
+    const btn = (i) => !!(pad && pad.buttons && pad.buttons[i] && pad.buttons[i].pressed);
+    const ax = (pad && pad.axes && pad.axes.length >= 2) ? pad.axes : [0, 0];
+    let dir = '';
+    if (this.keys.ArrowDown || this.keys.KeyS || btn(13) || ax[1] > this.MENU_STICK) dir = 'down';
+    else if (this.keys.ArrowUp || this.keys.KeyW || btn(12) || ax[1] < -this.MENU_STICK) dir = 'up';
+    else if (this.keys.ArrowLeft || this.keys.KeyA || btn(14) || ax[0] < -this.MENU_STICK) dir = 'left';
+    else if (this.keys.ArrowRight || this.keys.KeyD || btn(15) || ax[0] > this.MENU_STICK) dir = 'right';
+    if (dir && dir !== this.iaDirHeld) this.g.stepInteract(dir);
+    this.iaDirHeld = dir;
   }
 
   menuButtons() {
@@ -313,7 +368,7 @@ class BloxInput {
 
   applyKeys() {
     const g = this.g;
-    if (this.pointerDown || g.ui.menuOpen()) return;
+    if (this.pointerDown || g.ui.menuOpen() || g.waitingOnAct) return;
     const hard = this.keys.ShiftLeft || this.keys.ShiftRight;
     const mag = hard ? this.KEY_TILT_HARD : this.KEY_TILT;
     let x = 0;
@@ -352,12 +407,19 @@ class BloxInput {
           const b = tspot[i];
           if (b.bloxType === BloxType.BOMB) {
             if (Math.abs(world.x - b.pos.x) < g.bloxDistDiv2 && Math.abs(world.y - b.pos.y) < g.bloxDistDiv2) {
-              g.physics.blowUpBlox(b);
+              if (g.waitingOnAct) {
+                g.curiaBlox = b;
+                g.confirmInteract();
+              } else {
+                g.physics.blowUpBlox(b);
+              }
             }
           }
         }
       }
     }
+
+    if (g.waitingOnAct) return;
 
     if (phase === 'move' || phase === 'down') {
       const ox = this.dragOrigin ? this.dragOrigin.x : rect.width * 0.5;
