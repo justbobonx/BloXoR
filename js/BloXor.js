@@ -205,7 +205,17 @@ class BloXor {
     return list;
   }
 
+  startFromWait(consumeAct) {
+    if (this.gameState !== GameState.WaitToStartNewLevel) return;
+    this.gameState = GameState.InPlay;
+    if (consumeAct) {
+      this.input.actHeld = true;
+      this.input.ignoreInteract = true;
+    }
+  }
+
   beginInteract() {
+    if (this.input.ignoreInteract) return false;
     if (this.gameState !== GameState.InPlay || this.waitingOnAct) return false;
     const list = this.collectInteractBloxs();
     if (list.length === 0) return false;
@@ -290,6 +300,10 @@ class BloXor {
     }
     if (this.waitingOnAct) {
       this.cancelInteract();
+      return;
+    }
+    if (this.ui.visible('pauseScreen')) {
+      this.resumePlay();
       return;
     }
     if (this.gameState === GameState.InPlay || this.gameState === GameState.WaitToStartNewLevel) {
