@@ -97,9 +97,7 @@ class GameView {
       g.alignArrow.setPos(co);
       g.alignBg.draw(ctx);
       g.alignArrow.draw(ctx);
-      if (g.downx === 0 && g.downy === 0) {
-        g.gameState = GameState.InPlay;
-      }
+      if (g.downx === 0 && g.downy === 0) g.startFromWait(false);
     }
 
     ctx.setTransform(1, 0, 0, 1, 0, 0);
