@@ -80,6 +80,11 @@ html, body {
   cursor: not-allowed;
 }
 
+button.ui-focus,
+.ls-row.ui-focus {
+  box-shadow: 0 0 0 3px #fff, 0 0 0 6px #3d8a3d;
+}
+
 #startHint {
   opacity: 0.7;
   font-size: 0.95rem;
