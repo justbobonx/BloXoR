@@ -17,6 +17,7 @@ class BloxInput {
     this.aHeld = false;
     this.bHeld = false;
     this.actHeld = false;
+    this.ignoreInteract = false;
     this.iaDirHeld = '';
 
     this.tiltAttached = false;
@@ -47,10 +48,16 @@ class BloxInput {
         g.backPressed();
         return;
       }
-      if (e.code === 'Space' && g.gameState === GameState.InPlay && !g.ui.menuOpen()) {
-        if (g.waitingOnAct) g.confirmInteract();
-        else g.beginInteract();
-        return;
+      if (e.code === 'Space' && !g.ui.menuOpen()) {
+        if (g.gameState === GameState.WaitToStartNewLevel) {
+          g.startFromWait(true);
+          return;
+        }
+        if (g.gameState === GameState.InPlay) {
+          if (g.waitingOnAct) g.confirmInteract();
+          else g.beginInteract();
+          return;
+        }
       }
       if (!g.ui.menuOpen() && !g.waitingOnAct) this.applyKeys();
     });
@@ -275,11 +282,21 @@ class BloxInput {
   }
 
   pollAct() {
-    if (this.g.gameState !== GameState.InPlay) {
-      this.actHeld = this.actDown();
+    const held = this.actDown();
+    if (this.g.gameState === GameState.WaitToStartNewLevel) {
+      if (held && !this.actHeld) this.g.startFromWait(true);
+      this.actHeld = held;
       return;
     }
-    const held = this.actDown();
+    if (this.ignoreInteract) {
+      if (!held) this.ignoreInteract = false;
+      this.actHeld = held;
+      return;
+    }
+    if (this.g.gameState !== GameState.InPlay) {
+      this.actHeld = held;
+      return;
+    }
     if (held && !this.actHeld) {
       if (this.g.waitingOnAct) this.g.confirmInteract();
       else this.g.beginInteract();
@@ -361,9 +378,16 @@ class BloxInput {
     if (this.g.ui.menuOpen()) return;
     const pad = this.currentPad();
     const btn = (i) => !!(pad && pad.buttons && pad.buttons[i] && pad.buttons[i].pressed);
-    const pauseHeld = btn(9) || btn(1);
-    if (pauseHeld && !this.startHeld) this.g.backPressed();
-    this.startHeld = pauseHeld;
+    const start = btn(9);
+    const b = btn(1);
+    if (this.g.gameState === GameState.WaitToStartNewLevel) {
+      if (b && !this.bHeld) this.g.startFromWait(true);
+      if (start && !this.startHeld) this.g.backPressed();
+      this.startHeld = start;
+      return;
+    }
+    if ((start || b) && !this.startHeld) this.g.backPressed();
+    this.startHeld = start || b;
   }
 
   applyKeys() {
