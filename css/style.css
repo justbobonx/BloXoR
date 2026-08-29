@@ -40,6 +40,23 @@ html.stage-swap #game-container {
   touch-action: none;
 }
 
+#orientGate {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#orientGate img {
+  display: block;
+  width: min(72%, 340px);
+  height: auto;
+  image-rendering: pixelated;
+}
+
 #startScreen {
   position: absolute;
   inset: 0;
