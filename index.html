@@ -3,12 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="screen-orientation" content="landscape">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <title>BloXoR</title>
-  <link rel="stylesheet" href="css/style.css?v=0.3.2">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="css/style.css?v=0.3.3">
   <link rel="icon" href="assets/images/icon.png" type="image/png">
 </head>
 <body>
+  <div id="rotateHint">Turn the phone sideways</div>
   <div id="game-container">
     <canvas id="gameCanvas"></canvas>
 
@@ -68,24 +73,24 @@
   </div>
 
   <script>
-    window.VERSION = '0.3.2';
+    window.VERSION = '0.3.3';
     document.getElementById('startVersion').textContent = 'v' + window.VERSION;
   </script>
-  <script src="js/Coord.js?v=0.3.2"></script>
-  <script src="js/GfxState.js?v=0.3.2"></script>
-  <script src="js/BitmapManager.js?v=0.3.2"></script>
-  <script src="js/Sprite.js?v=0.3.2"></script>
-  <script src="js/SoundManager.js?v=0.3.2"></script>
-  <script src="js/Blox.js?v=0.3.2"></script>
-  <script src="js/LevelData.js?v=0.3.2"></script>
-  <script src="js/GameSave.js?v=0.3.2"></script>
-  <script src="js/BloxField.js?v=0.3.2"></script>
-  <script src="js/BloxPhysics.js?v=0.3.2"></script>
-  <script src="js/BloxInput.js?v=0.3.2"></script>
-  <script src="js/PuzzleLoader.js?v=0.3.2"></script>
-  <script src="js/LevelIndex.js?v=0.3.2"></script>
-  <script src="js/GameView.js?v=0.3.2"></script>
-  <script src="js/BloXor.js?v=0.3.2"></script>
-  <script src="js/main.js?v=0.3.2"></script>
+  <script src="js/Coord.js?v=0.3.3"></script>
+  <script src="js/GfxState.js?v=0.3.3"></script>
+  <script src="js/BitmapManager.js?v=0.3.3"></script>
+  <script src="js/Sprite.js?v=0.3.3"></script>
+  <script src="js/SoundManager.js?v=0.3.3"></script>
+  <script src="js/Blox.js?v=0.3.3"></script>
+  <script src="js/LevelData.js?v=0.3.3"></script>
+  <script src="js/GameSave.js?v=0.3.3"></script>
+  <script src="js/BloxField.js?v=0.3.3"></script>
+  <script src="js/BloxPhysics.js?v=0.3.3"></script>
+  <script src="js/BloxInput.js?v=0.3.3"></script>
+  <script src="js/PuzzleLoader.js?v=0.3.3"></script>
+  <script src="js/LevelIndex.js?v=0.3.3"></script>
+  <script src="js/GameView.js?v=0.3.3"></script>
+  <script src="js/BloXor.js?v=0.3.3"></script>
+  <script src="js/main.js?v=0.3.3"></script>
 </body>
 </html>
