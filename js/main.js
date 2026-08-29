@@ -21,6 +21,9 @@ function resize() {
   game.resize(cssW, cssH);
 }
 
+window.applyStage = applyStage;
+window.resizeGame = resize;
+
 window.addEventListener('resize', resize);
 window.addEventListener('orientationchange', () => setTimeout(resize, 200));
 document.addEventListener('fullscreenchange', resize);
