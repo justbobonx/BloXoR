@@ -46,6 +46,13 @@ class GameView {
     g.alignArrow.curGState.scale = 1;
     g.alignBg.setPos(new Coord(g.CENTER_X, g.CENTER_Y));
 
+    if (!g.iaHilite) {
+      g.iaHilite = new Sprite(BitmapManager.getInstance().get('hilite_circle'), new Coord(g.CENTER_X, g.CENTER_Y));
+    } else {
+      g.iaHilite.setBitmap(BitmapManager.getInstance().get('hilite_circle'));
+    }
+    g.iaHilite.curGState.scale = 1;
+
     g.TOP = g.CENTER_Y - boardH / 2 + g.bloxDist;
     g.BOTTOM = g.CENTER_Y + boardH / 2 - g.bloxDist;
     g.LEFT = g.CENTER_X - boardW / 2 + g.bloxDist;
@@ -74,6 +81,12 @@ class GameView {
       }
     }
 
+    if (g.waitingOnAct && g.curiaBlox && g.iaHilite) {
+      g.iaHilite.setPos(new Coord(g.curiaBlox.pos.x, g.curiaBlox.pos.y));
+      g.iaHilite.curGState.rotation = (g.iaHilite.curGState.rotation + 1.4) % 360;
+      g.iaHilite.draw(ctx);
+    }
+
     if (g.gameState === GameState.WaitToStartNewLevel) {
       const co = new Coord(
         g.CENTER_X + (g.alignBg.getWidth() / 1.8 * g.downx),
@@ -84,9 +97,7 @@ class GameView {
       g.alignArrow.setPos(co);
       g.alignBg.draw(ctx);
       g.alignArrow.draw(ctx);
-      if (g.downx === 0 && g.downy === 0) {
-        g.gameState = GameState.InPlay;
-      }
+      if (g.downx === 0 && g.downy === 0) g.startFromWait(false);
     }
 
     ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -111,7 +122,7 @@ class GameView {
     ctx.textAlign = 'left';
     ctx.font = Math.max(10, Math.round(this.canvas.height * 0.028)) + 'px sans-serif';
     ctx.fillStyle = 'rgba(255,255,255,0.65)';
-    ctx.fillText('arrows / WASD  ·  drag to tilt  ·  tap bomb  ·  Esc pause', pad, this.canvas.height - pad - 16);
+    ctx.fillText('arrows / WASD  ·  drag to tilt  ·  A / Space bomb  ·  Esc pause', pad, this.canvas.height - pad - 16);
     ctx.restore();
   }
 }

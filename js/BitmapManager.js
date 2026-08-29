@@ -45,6 +45,25 @@ class BitmapManager {
     return c;
   }
 
+  makeHilite() {
+    const c = document.createElement('canvas');
+    c.width = 48;
+    c.height = 48;
+    const ctx = c.getContext('2d');
+    ctx.strokeStyle = 'rgba(255,220,80,0.95)';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(24, 24, 18, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.strokeStyle = 'rgba(255,255,255,0.55)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(24, 24, 12, 0.2, Math.PI * 1.1);
+    ctx.stroke();
+    this.cache.set('hilite_circle', c);
+    return c;
+  }
+
   makeBoard(w, h) {
     const c = document.createElement('canvas');
     c.width = w;
@@ -75,6 +94,7 @@ class BitmapManager {
 
   loadPlaceholders() {
     this.makeBoard(480, 320);
+    this.makeHilite();
     this.makeTile('blx_wall', '#5a5a5a', '');
     this.makeTile('blx_generic_movable', '#c8c8d0', '');
     this.makeTile('blx_o', '#3cb4ff', 'O');
@@ -105,6 +125,7 @@ class BitmapManager {
     this.loadPlaceholders();
     const files = {
       whole_bg_ls: 'assets/images/whole_bg_ls.png',
+      hilite_circle: 'assets/images/hilite_circle.png',
       blx_wall: 'assets/images/blx_wall.png',
       blx_generic_movable: 'assets/images/blx_generic_movable.png',
       blx_o: 'assets/images/blx_o.png',
