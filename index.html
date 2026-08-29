@@ -8,8 +8,11 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <title>BloXoR</title>
   <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="css/style.css?v=0.3.7">
   <link rel="icon" href="assets/images/icon.png" type="image/png">
+  <script>
+    window.VERSION = '0.3.8';
+    document.write('<link rel="stylesheet" href="css/style.css?v=' + window.VERSION + '">');
+  </script>
 </head>
 <body>
   <div id="game-container">
@@ -75,24 +78,27 @@
   </div>
 
   <script>
-    window.VERSION = '0.3.7';
     document.getElementById('startVersion').textContent = 'v' + window.VERSION;
+    [
+      'js/Coord.js',
+      'js/GfxState.js',
+      'js/BitmapManager.js',
+      'js/Sprite.js',
+      'js/SoundManager.js',
+      'js/Blox.js',
+      'js/LevelData.js',
+      'js/GameSave.js',
+      'js/BloxField.js',
+      'js/BloxPhysics.js',
+      'js/BloxInput.js',
+      'js/PuzzleLoader.js',
+      'js/LevelIndex.js',
+      'js/GameView.js',
+      'js/BloXor.js',
+      'js/main.js'
+    ].forEach(function (src) {
+      document.write('<script src="' + src + '?v=' + window.VERSION + '"><\/script>');
+    });
   </script>
-  <script src="js/Coord.js?v=0.3.7"></script>
-  <script src="js/GfxState.js?v=0.3.7"></script>
-  <script src="js/BitmapManager.js?v=0.3.7"></script>
-  <script src="js/Sprite.js?v=0.3.7"></script>
-  <script src="js/SoundManager.js?v=0.3.7"></script>
-  <script src="js/Blox.js?v=0.3.7"></script>
-  <script src="js/LevelData.js?v=0.3.7"></script>
-  <script src="js/GameSave.js?v=0.3.7"></script>
-  <script src="js/BloxField.js?v=0.3.7"></script>
-  <script src="js/BloxPhysics.js?v=0.3.7"></script>
-  <script src="js/BloxInput.js?v=0.3.7"></script>
-  <script src="js/PuzzleLoader.js?v=0.3.7"></script>
-  <script src="js/LevelIndex.js?v=0.3.7"></script>
-  <script src="js/GameView.js?v=0.3.7"></script>
-  <script src="js/BloXor.js?v=0.3.7"></script>
-  <script src="js/main.js?v=0.3.7"></script>
 </body>
 </html>
