@@ -98,6 +98,7 @@ class BloXor {
     this.pauseGameState = null;
     this.initialized = false;
     this.loopTimer = null;
+    this.chromeWait = null;
 
     this.soundManager = SoundManager.getInstance();
     this.field = new BloxField(this);
@@ -127,6 +128,7 @@ class BloXor {
   startLoop() {
     if (this.loopTimer) clearInterval(this.loopTimer);
     this.loopTimer = setInterval(() => {
+      if (this.ui.gateOpen()) return;
       if (this.ui.menuOpen()) {
         this.input.poll();
         this.ui.navTick();
@@ -178,19 +180,69 @@ class BloXor {
   }
 
   enterPlayFullscreen() {
-    if (this.isFullscreen()) return;
-    const el = document.getElementById('game-container') || this.canvas;
-    const req = el.requestFullscreen || el.webkitRequestFullscreen || el.webkitRequestFullScreen;
-    if (!req) return;
-    try {
-      const p = req.call(el);
-      if (p && typeof p.catch === 'function') {
-        p.catch((err) => console.warn('Fullscreen request failed', err));
-      }
-    } catch (err) {
-      console.warn('Fullscreen request failed', err);
-    }
+    return this.enterPlayChrome();
+  }
+
+  enterPlayChrome() {
+    if (this.chromeWait) return this.chromeWait;
+    this.chromeWait = this.runPlayChrome().then(() => {
+      this.chromeWait = null;
+    }, () => {
+      this.chromeWait = null;
+    });
+    return this.chromeWait;
+  }
+
+  async runPlayChrome() {
+    this.ui.showGate();
     this.input.enableTilt();
+    this.input.absorbButtons();
+    if (!this.isFullscreen()) await this.requestPageFullscreen();
+    if (typeof window.applyStage === 'function') window.applyStage();
+    await this.waitChromeSettled();
+    if (typeof window.resizeGame === 'function') window.resizeGame();
+    this.ui.hideGate();
+    this.input.absorbButtons();
+  }
+
+  requestPageFullscreen() {
+    const el = document.documentElement;
+    const req = el.requestFullscreen || el.webkitRequestFullscreen || el.webkitRequestFullScreen ||
+      document.body.requestFullscreen || document.body.webkitRequestFullscreen;
+    if (!req) return Promise.resolve();
+    try {
+      const p = req.call(el.contains(document.body) ? el : document.body);
+      if (p && typeof p.then === 'function') return p.catch(() => {});
+    } catch (err) {}
+    return Promise.resolve();
+  }
+
+  waitChromeSettled() {
+    return new Promise((resolve) => {
+      let settled = false;
+      const finish = () => {
+        if (settled) return;
+        settled = true;
+        document.removeEventListener('fullscreenchange', onFs);
+        document.removeEventListener('webkitfullscreenchange', onFs);
+        window.removeEventListener('resize', onRs);
+        window.removeEventListener('orientationchange', onRs);
+        resolve();
+      };
+      const onFs = () => {
+        if (typeof window.applyStage === 'function') window.applyStage();
+        if (typeof window.resizeGame === 'function') window.resizeGame();
+        setTimeout(finish, 80);
+      };
+      const onRs = () => {
+        if (typeof window.applyStage === 'function') window.applyStage();
+      };
+      document.addEventListener('fullscreenchange', onFs);
+      document.addEventListener('webkitfullscreenchange', onFs);
+      window.addEventListener('resize', onRs);
+      window.addEventListener('orientationchange', onRs);
+      setTimeout(finish, 750);
+    });
   }
 
   exitFullscreen() {
@@ -204,6 +256,7 @@ class BloXor {
   }
 
   onLostFocus() {
+    if (this.ui.gateOpen()) return;
     const playing = this.gameState === GameState.InPlay || this.gameState === GameState.WaitToStartNewLevel;
     if (playing && !this.ui.menuOpen()) {
       this.pauseGameState = this.gameState;
@@ -211,6 +264,10 @@ class BloXor {
       this.ui.showPause();
     }
     this.exitFullscreen();
+    setTimeout(() => {
+      if (typeof window.applyStage === 'function') window.applyStage();
+      if (typeof window.resizeGame === 'function') window.resizeGame();
+    }, 120);
   }
 
   collectInteractBloxs() {
@@ -310,10 +367,11 @@ class BloXor {
   }
 
   restartLevel() {
-    this.playLevel(this.curPuzzleInd);
+    this.enterPlayChrome().then(() => this.playLevel(this.curPuzzleInd));
   }
 
   backPressed() {
+    if (this.ui.gateOpen()) return;
     if (this.ui.detailOpen()) {
       this.ui.closeDetail();
       this.input.absorbButtons();
@@ -336,12 +394,14 @@ class BloXor {
   }
 
   resumePlay() {
-    this.ui.hideMenus();
-    this.gameState = this.pauseGameState || GameState.InPlay;
-    if (this.gameState === GameState.NoDraw) this.gameState = GameState.InPlay;
-    this.pauseGameState = null;
     this.input.absorbButtons();
-    this.enterPlayFullscreen();
+    this.enterPlayChrome().then(() => {
+      this.ui.hideMenus();
+      this.gameState = this.pauseGameState || GameState.InPlay;
+      if (this.gameState === GameState.NoDraw) this.gameState = GameState.InPlay;
+      this.pauseGameState = null;
+      this.input.absorbButtons();
+    });
   }
 
   setSoundMute(muted) {
@@ -429,23 +489,25 @@ class BloXorUI {
   bind() {
     const g = this.g;
     document.getElementById('newGameButton').addEventListener('click', () => {
-      g.enterPlayFullscreen();
       document.getElementById('startScreen').classList.add('hidden');
-      this.showLevelSelect();
+      g.enterPlayChrome().then(() => this.showLevelSelect());
     });
     document.getElementById('continueButton').addEventListener('click', () => {
-      g.enterPlayFullscreen();
       document.getElementById('startScreen').classList.add('hidden');
-      this.showLevelSelect();
+      g.enterPlayChrome().then(() => this.showLevelSelect());
     });
     document.getElementById('ps_resume').addEventListener('click', () => g.resumePlay());
     document.getElementById('ps_restart').addEventListener('click', () => g.restartLevel());
-    document.getElementById('ps_menu').addEventListener('click', () => this.showLevelSelect());
+    document.getElementById('ps_menu').addEventListener('click', () => {
+      g.enterPlayChrome().then(() => this.showLevelSelect());
+    });
     document.getElementById('ld_back').addEventListener('click', () => this.closeDetail());
-    document.getElementById('ld_play').addEventListener('click', () => g.playLevel(g.curPuzzleInd));
+    document.getElementById('ld_play').addEventListener('click', () => {
+      g.enterPlayChrome().then(() => g.playLevel(g.curPuzzleInd));
+    });
     document.getElementById('sc_ok').addEventListener('click', () => {
       this.closeScore();
-      this.showLevelSelect();
+      g.enterPlayChrome().then(() => this.showLevelSelect());
     });
     document.getElementById('sb_mute').addEventListener('click', () => {
       g.setSoundMute(!g.soundManager.muted());
@@ -455,6 +517,20 @@ class BloXorUI {
 
   menuOpen() {
     return !!this.menuLayer();
+  }
+
+  gateOpen() {
+    return this.visible('orientGate');
+  }
+
+  showGate() {
+    const el = document.getElementById('orientGate');
+    if (el) el.classList.remove('hidden');
+  }
+
+  hideGate() {
+    const el = document.getElementById('orientGate');
+    if (el) el.classList.add('hidden');
   }
 
   menuLayer() {
