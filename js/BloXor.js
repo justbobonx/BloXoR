@@ -28,9 +28,7 @@ class BloXor {
     this.BLOX_SPEED = 22;
     this.BLOX_FRICTION_MIN = 0.1;
     this.BLOX_FRICTION_RANGE = 0.85;
-    this.BLOX_POS_PRECISION = 100;
-    this.FLAT_SPAN = 0.02;
-    this.FLAT_START = 0.01;
+    this.BLOX_POS_PRECISION = 100;    
     this.NUM_LEVELS_ALLOW_OPEN = 6;
 
     this.theScale = 1;

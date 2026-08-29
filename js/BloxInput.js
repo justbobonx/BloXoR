@@ -7,6 +7,9 @@ class BloxInput {
     this.dragOrigin = null;
     this.holdTimer = 0;
     this.holdWorld = null;
+    this.FLAT_SPAN = 0.03;
+    this.FLAT_START = 0.01;
+    this.TILT_GAIN = 1.5;
     this.LONG_PRESS_MS = 550;
     this.KEY_TILT = 0.12;
     this.KEY_TILT_HARD = 0.26;
@@ -309,14 +312,12 @@ class BloxInput {
     accy = Math.max(-1, Math.min(1, accy));
     accz = Math.max(-1, Math.min(1, accz));
 
-    const span = g.FLAT_SPAN;
-    const start = g.FLAT_START;
-    if (Math.abs(downx) < span) downx = 0;
-    else if (downx > 0) downx -= start;
-    else downx += start;
-    if (Math.abs(downy) < span) downy = 0;
-    else if (downy > 0) downy -= start;
-    else downy += start;
+    if (Math.abs(downx) < this.FLAT_SPAN) downx = 0;
+    else if (downx > 0) downx -= this.FLAT_START;
+    else downx += this.FLAT_START;
+    if (Math.abs(downy) < this.FLAT_SPAN) downy = 0;
+    else if (downy > 0) downy -= this.FLAT_START;
+    else downy += this.FLAT_START;
 
     this.lastdx2 = this.lastdx;
     this.lastdy2 = this.lastdy;
@@ -325,9 +326,8 @@ class BloxInput {
     this.lastdy = accy;
     this.lastdz = accz;
 
-    const TILT_GAIN = 1.6;
-    g.downx = downx * TILT_GAIN;
-    g.downy = downy * TILT_GAIN;
+    g.downx = downx * this.TILT_GAIN;
+    g.downy = downy * this.TILT_GAIN;
     g.downz = downz;
     this.lastTiltAt = Date.now();
     g.updateMoveCnt();
