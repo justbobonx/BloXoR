@@ -183,6 +183,16 @@ class BloXor {
     return this.enterPlayChrome();
   }
 
+  tallViewport() {
+    return window.innerHeight > window.innerWidth;
+  }
+
+  needsChromeGate() {
+    if (!this.tallViewport()) return false;
+    if (this.isFullscreen() && document.documentElement.classList.contains('stage-swap')) return false;
+    return true;
+  }
+
   enterPlayChrome() {
     if (this.chromeWait) return this.chromeWait;
     this.chromeWait = this.runPlayChrome().then(() => {
@@ -194,12 +204,14 @@ class BloXor {
   }
 
   async runPlayChrome() {
-    this.ui.showGate();
+    if (typeof window.applyStage === 'function') window.applyStage();
+    const gate = this.needsChromeGate();
+    if (gate) this.ui.showGate();
     this.input.enableTilt();
     this.input.absorbButtons();
     if (!this.isFullscreen()) await this.requestPageFullscreen();
     if (typeof window.applyStage === 'function') window.applyStage();
-    await this.waitChromeSettled();
+    if (gate) await this.waitChromeSettled();
     if (typeof window.resizeGame === 'function') window.resizeGame();
     this.ui.hideGate();
     this.input.absorbButtons();
