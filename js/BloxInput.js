@@ -302,9 +302,11 @@ class BloxInput {
     this.lastdx = accx;
     this.lastdy = accy;
     this.lastdz = accz;
+    
+    const TILT_GAIN = 1.6;
 
-    g.downx = downx;
-    g.downy = downy;
+    g.downx = downx*=TILT_GAIN;
+    g.downy = downy*=TILT_GAIN;;
     g.downz = downz;
     this.lastTiltAt = Date.now();
     g.updateMoveCnt();
