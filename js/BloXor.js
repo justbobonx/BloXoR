@@ -193,6 +193,26 @@ class BloXor {
     this.input.enableTilt();
   }
 
+  exitFullscreen() {
+    if (!this.isFullscreen()) return;
+    const ex = document.exitFullscreen || document.webkitExitFullscreen || document.webkitCancelFullScreen;
+    if (!ex) return;
+    try {
+      const p = ex.call(document);
+      if (p && typeof p.catch === 'function') p.catch(() => {});
+    } catch (err) {}
+  }
+
+  onLostFocus() {
+    const playing = this.gameState === GameState.InPlay || this.gameState === GameState.WaitToStartNewLevel;
+    if (playing && !this.ui.menuOpen()) {
+      this.pauseGameState = this.gameState;
+      this.gameState = GameState.NoDraw;
+      this.ui.showPause();
+    }
+    this.exitFullscreen();
+  }
+
   collectInteractBloxs() {
     const list = [];
     const add = (arr) => {
@@ -309,6 +329,7 @@ class BloXor {
       return;
     }
     if (this.gameState === GameState.InPlay || this.gameState === GameState.WaitToStartNewLevel) {
+      this.pauseGameState = this.gameState;
       this.gameState = GameState.NoDraw;
       this.ui.showPause();
     }
@@ -316,8 +337,11 @@ class BloXor {
 
   resumePlay() {
     this.ui.hideMenus();
-    this.gameState = GameState.InPlay;
+    this.gameState = this.pauseGameState || GameState.InPlay;
+    if (this.gameState === GameState.NoDraw) this.gameState = GameState.InPlay;
+    this.pauseGameState = null;
     this.input.absorbButtons();
+    this.enterPlayFullscreen();
   }
 
   setSoundMute(muted) {

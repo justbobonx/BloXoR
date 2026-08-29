@@ -31,6 +31,26 @@ html, body {
   touch-action: none;
 }
 
+#rotateHint {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: #000;
+  color: #fff;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 24px;
+  font-size: 1.15rem;
+}
+
+@media (orientation: portrait) {
+  #rotateHint {
+    display: flex;
+  }
+}
+
 #startScreen {
   position: absolute;
   inset: 0;
