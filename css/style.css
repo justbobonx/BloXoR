@@ -24,31 +24,20 @@ html, body {
   background: #000;
 }
 
+html.stage-swap #game-container {
+  width: min(100vh, calc(100vw * 1.5));
+  height: min(100vw, calc(100vh / 1.5));
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+
 #gameCanvas {
   display: block;
   width: 100%;
   height: 100%;
   touch-action: none;
-}
-
-#rotateHint {
-  display: none;
-  position: fixed;
-  inset: 0;
-  z-index: 40;
-  background: #000;
-  color: #fff;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 24px;
-  font-size: 1.15rem;
-}
-
-@media (orientation: portrait) {
-  #rotateHint {
-    display: flex;
-  }
 }
 
 #startScreen {
