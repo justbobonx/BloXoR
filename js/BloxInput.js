@@ -58,6 +58,27 @@ class BloxInput {
     this.iaDirHeld = 'hold';
   }
 
+  stageSwapped() {
+    return document.documentElement.classList.contains('stage-swap');
+  }
+
+  pointerCss(ev, el) {
+    const r = el.getBoundingClientRect();
+    if (!this.stageSwapped()) {
+      return {
+        x: ev.clientX - r.left,
+        y: ev.clientY - r.top,
+        w: el.clientWidth,
+        h: el.clientHeight
+      };
+    }
+    const dx = ev.clientX - (r.left + r.width / 2);
+    const dy = ev.clientY - (r.top + r.height / 2);
+    const w = el.clientWidth;
+    const h = el.clientHeight;
+    return { x: dy + w / 2, y: -dx + h / 2, w, h };
+  }
+
   attach(canvas) {
     const g = this.g;
     window.addEventListener('keydown', (e) => {
@@ -104,11 +125,8 @@ class BloxInput {
     const onDown = (ev) => {
       this.pointerDown = true;
       this.pointerDragged = false;
-      const rect = canvas.getBoundingClientRect();
-      this.dragOrigin = {
-        x: ev.clientX - rect.left,
-        y: ev.clientY - rect.top
-      };
+      const p = this.pointerCss(ev, canvas);
+      this.dragOrigin = { x: p.x, y: p.y };
       this.handlePointer(ev, canvas, 'down');
     };
     const onMove = (ev) => {
@@ -187,17 +205,15 @@ class BloxInput {
 
   toWorld(ev, canvas) {
     const g = this.g;
-    const rect = canvas.getBoundingClientRect();
-    const cssX = ev.clientX - rect.left;
-    const cssY = ev.clientY - rect.top;
-    const cx = cssX * (canvas.width / rect.width);
-    const cy = cssY * (canvas.height / rect.height);
+    const p = this.pointerCss(ev, canvas);
+    const cx = p.w ? p.x * (canvas.width / p.w) : 0;
+    const cy = p.h ? p.y * (canvas.height / p.h) : 0;
     const scale = g.viewScale || 1;
     return {
       x: (cx - (g.viewOx || 0)) / scale,
       y: (cy - (g.viewOy || 0)) / scale,
-      cssX,
-      cssY
+      cssX: p.x,
+      cssY: p.y
     };
   }
 
@@ -263,6 +279,12 @@ class BloxInput {
   }
 
   remapToScreen(gx, gy) {
+    if (this.stageSwapped()) {
+      let x = gy;
+      let y = -gx;
+      y = -y;
+      return { x, y };
+    }
     const a = ((this.screenAngle() % 360) + 360) % 360;
     let x = gx;
     let y = gy;
@@ -302,11 +324,10 @@ class BloxInput {
     this.lastdx = accx;
     this.lastdy = accy;
     this.lastdz = accz;
-    
-    const TILT_GAIN = 1.6;
 
-    g.downx = downx*=TILT_GAIN;
-    g.downy = downy*=TILT_GAIN;;
+    const TILT_GAIN = 1.6;
+    g.downx = downx * TILT_GAIN;
+    g.downy = downy * TILT_GAIN;
     g.downz = downz;
     this.lastTiltAt = Date.now();
     g.updateMoveCnt();
@@ -519,9 +540,9 @@ class BloxInput {
 
   handlePointer(ev, canvas, phase) {
     const g = this.g;
-    const rect = canvas.getBoundingClientRect();
-    const x = ev.clientX - rect.left;
-    const y = ev.clientY - rect.top;
+    const p = this.pointerCss(ev, canvas);
+    const x = p.x;
+    const y = p.y;
     const world = this.toWorld(ev, canvas);
 
     if (g.gameState === GameState.LevelBeat) {
@@ -538,8 +559,8 @@ class BloxInput {
     }
 
     if (phase === 'move' || phase === 'down') {
-      const ox = this.dragOrigin ? this.dragOrigin.x : rect.width * 0.5;
-      const oy = this.dragOrigin ? this.dragOrigin.y : rect.height * 0.5;
+      const ox = this.dragOrigin ? this.dragOrigin.x : p.w * 0.5;
+      const oy = this.dragOrigin ? this.dragOrigin.y : p.h * 0.5;
       const dx = x - ox;
       const dy = y - oy;
       const dist = Math.sqrt(dx * dx + dy * dy);
