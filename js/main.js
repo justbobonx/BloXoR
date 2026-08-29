@@ -41,10 +41,15 @@ document.addEventListener('webkitfullscreenchange', () => {
   resize();
   if (game.isFullscreen()) lockLandscape();
 });
-window.addEventListener('pagehide', () => game.saveGame());
+window.addEventListener('pagehide', () => {
+  game.saveGame();
+  game.onLostFocus();
+});
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'hidden') game.saveGame();
-  else if (game.isFullscreen()) lockLandscape();
+  if (document.visibilityState === 'hidden') {
+    game.saveGame();
+    game.onLostFocus();
+  }
 });
 
 game.boot().then(() => {
