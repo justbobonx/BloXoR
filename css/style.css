@@ -41,7 +41,7 @@ html.stage-swap #game-container {
 }
 
 #orientGate {
-  position: fixed;
+  position: absolute;
   inset: 0;
   z-index: 80;
   background: #000;
