@@ -1,0 +1,16 @@
+{
+  "name": "BloXoR",
+  "short_name": "BloXoR",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "start_url": "./",
+  "icons": [
+    {
+      "src": "assets/images/icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}
