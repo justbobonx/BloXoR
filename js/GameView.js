@@ -3,6 +3,8 @@ class GameView {
     this.g = game;
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
+    this.waitFlatSince = 0;
+    this.waitState = null;
   }
 
   layout(cssW, cssH) {
@@ -88,6 +90,10 @@ class GameView {
     }
 
     if (g.gameState === GameState.WaitToStartNewLevel) {
+      if (this.waitState !== g.gameState) {
+        this.waitState = g.gameState;
+        this.waitFlatSince = 0;
+      }
       const co = new Coord(
         g.CENTER_X + (g.alignBg.getWidth() / 1.8 * g.downx),
         g.CENTER_Y + (g.alignBg.getHeight() / 1.8 * g.downy)
@@ -97,7 +103,17 @@ class GameView {
       g.alignArrow.setPos(co);
       g.alignBg.draw(ctx);
       g.alignArrow.draw(ctx);
-      if (g.downx === 0 && g.downy === 0) g.startFromWait(false);
+      const flat = (g.downx === 0 && g.downy === 0);
+      const sensed = g.input.tiltLive();
+      if (sensed && flat) {
+        if (!this.waitFlatSince) this.waitFlatSince = Date.now();
+        if (Date.now() - this.waitFlatSince >= 180) g.startFromWait(false);
+      } else {
+        this.waitFlatSince = 0;
+      }
+    } else {
+      this.waitState = g.gameState;
+      this.waitFlatSince = 0;
     }
 
     ctx.setTransform(1, 0, 0, 1, 0, 0);
