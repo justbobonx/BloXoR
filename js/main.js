@@ -21,12 +21,6 @@ function resize() {
   game.resize(cssW, cssH);
 }
 
-function onBackground(ev) {
-  if (ev.type === 'visibilitychange' && document.visibilityState !== 'hidden') return;
-  game.saveGame();
-  game.onLostFocus();
-}
-
 window.applyStage = applyStage;
 window.resizeGame = resize;
 
@@ -34,8 +28,10 @@ window.addEventListener('resize', resize);
 window.addEventListener('orientationchange', () => setTimeout(resize, 200));
 document.addEventListener('fullscreenchange', resize);
 document.addEventListener('webkitfullscreenchange', resize);
-window.addEventListener('pagehide', onBackground);
-document.addEventListener('visibilitychange', onBackground);
+window.addEventListener('pagehide', () => game.onLostFocus());
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') game.onLostFocus();
+});
 
 game.boot().then(() => {
   resize();

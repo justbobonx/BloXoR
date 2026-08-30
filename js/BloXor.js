@@ -271,6 +271,7 @@ class BloXor {
   }
 
   onLostFocus() {
+    this.saveGame();
     this.silenceAudio();
     if (this.ui.gateOpen()) return;
     const playing = this.gameState === GameState.InPlay || this.gameState === GameState.WaitToStartNewLevel;
