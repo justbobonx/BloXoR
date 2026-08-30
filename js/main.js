@@ -21,8 +21,8 @@ function resize() {
   game.resize(cssW, cssH);
 }
 
-function onBackground() {
-  if (document.visibilityState === 'visible') return;
+function onBackground(ev) {
+  if (ev.type === 'visibilitychange' && document.visibilityState !== 'hidden') return;
   game.saveGame();
   game.onLostFocus();
 }
