@@ -6,8 +6,8 @@ class GameView {
     this.waitFlatSince = 0;
     this.waitState = null;
     this.WAIT_FLAT_MS = 360;
-    this.ARROW_K = 0.22;
-    this.ARROW_K_FLAT = 0.4;
+    this.ARROW_K = 0.4;
+    this.ARROW_K_FLAT = 0.6;
     this.arrowX = null;
     this.arrowY = null;
     this.arrowS = 1;
