@@ -24,7 +24,13 @@ class BloxPhysics {
 
     g.modDownx = g.downx * g.BLOX_SPEED;
     g.modDowny = g.downy * g.BLOX_SPEED;
-    g.modFriction = g.BLOX_FRICTION_MIN + (1 - g.downz) * g.BLOX_FRICTION_RANGE;
+    const tiltDrive = g.input.tiltLive() && !g.input.usingManual();
+    if (tiltDrive) {
+      const flat = Math.max(0, Math.min(1, Math.abs(g.downz)));
+      g.modFriction = g.TILT_FRICTION_MIN + (1 - flat) * g.TILT_FRICTION_RANGE;
+    } else {
+      g.modFriction = g.STICK_FRICTION;
+    }
 
     const bloxList = [];
 
