@@ -5,6 +5,12 @@ class GameView {
     this.ctx = canvas.getContext('2d');
     this.waitFlatSince = 0;
     this.waitState = null;
+    this.WAIT_FLAT_MS = 360;
+    this.ARROW_K = 0.22;
+    this.ARROW_K_FLAT = 0.4;
+    this.arrowX = null;
+    this.arrowY = null;
+    this.arrowS = 1;
   }
 
   layout(cssW, cssH) {
@@ -93,27 +99,40 @@ class GameView {
       if (this.waitState !== g.gameState) {
         this.waitState = g.gameState;
         this.waitFlatSince = 0;
+        this.arrowX = g.CENTER_X;
+        this.arrowY = g.CENTER_Y;
+        this.arrowS = 1;
       }
-      const co = new Coord(
-        g.CENTER_X + (g.alignBg.getWidth() / 1.8 * g.downx),
-        g.CENTER_Y + (g.alignBg.getHeight() / 1.8 * g.downy)
-      );
-      const scale = 1 - Math.sqrt(Math.pow(g.downx, 2) + Math.pow(g.downy, 2));
-      g.alignArrow.curGState.scale = scale;
-      g.alignArrow.setPos(co);
+      const targetX = g.CENTER_X + (g.alignBg.getWidth() / 1.8 * g.downx);
+      const targetY = g.CENTER_Y + (g.alignBg.getHeight() / 1.8 * g.downy);
+      const mag = Math.sqrt(g.downx * g.downx + g.downy * g.downy);
+      const targetS = Math.max(0.35, 1 - Math.min(1, mag));
+      const atCenter = (g.downx === 0 && g.downy === 0);
+      const k = atCenter ? this.ARROW_K_FLAT : this.ARROW_K;
+      if (this.arrowX == null) {
+        this.arrowX = targetX;
+        this.arrowY = targetY;
+        this.arrowS = targetS;
+      } else {
+        this.arrowX += k * (targetX - this.arrowX);
+        this.arrowY += k * (targetY - this.arrowY);
+        this.arrowS += k * (targetS - this.arrowS);
+      }
+      g.alignArrow.curGState.scale = this.arrowS;
+      g.alignArrow.setPos(new Coord(this.arrowX, this.arrowY));
       g.alignBg.draw(ctx);
       g.alignArrow.draw(ctx);
-      const flat = (g.downx === 0 && g.downy === 0);
       const sensed = g.input.tiltLive();
-      if (sensed && flat) {
+      if (sensed && atCenter) {
         if (!this.waitFlatSince) this.waitFlatSince = Date.now();
-        if (Date.now() - this.waitFlatSince >= 180) g.startFromWait(false);
+        if (Date.now() - this.waitFlatSince >= this.WAIT_FLAT_MS) g.startFromWait(false);
       } else {
         this.waitFlatSince = 0;
       }
     } else {
       this.waitState = g.gameState;
       this.waitFlatSince = 0;
+      this.arrowX = null;
     }
 
     ctx.setTransform(1, 0, 0, 1, 0, 0);
