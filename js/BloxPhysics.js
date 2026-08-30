@@ -193,23 +193,51 @@ class BloxPhysics {
     const fieldBlox = [];
     let stoppedx = 0;
     let stoppedy = 0;
+    let pinnedX = false;
+    let pinnedY = false;
 
     const glueX = (hitBlox) => {
-      potNewX = q(potNewX <= hitBlox.pos.x ? hitBlox.pos.x - g.bloxDistMin1 : hitBlox.pos.x + g.bloxDistMin1);
-      aBlox.vel.x = hitBlox.mover ? hitBlox.vel.x : 0;
+      const rest = q(potNewX <= hitBlox.pos.x ? hitBlox.pos.x - g.bloxDistMin1 : hitBlox.pos.x + g.bloxDistMin1);
+      if (!hitBlox.mover) {
+        potNewX = rest;
+        aBlox.vel.x = 0;
+        pinnedX = true;
+        stoppedx += 1;
+        return;
+      }
+      if (pinnedX) {
+        aBlox.vel.x = 0;
+        stoppedx += 1;
+        return;
+      }
+      potNewX = rest;
+      aBlox.vel.x = hitBlox.vel.x;
       if (aBlox.vel.x === 0) stoppedx += 1;
     };
     const glueY = (hitBlox) => {
-      potNewY = q(potNewY <= hitBlox.pos.y ? hitBlox.pos.y - g.bloxDistMin1 : hitBlox.pos.y + g.bloxDistMin1);
-      aBlox.vel.y = hitBlox.mover ? hitBlox.vel.y : 0;
+      const rest = q(potNewY <= hitBlox.pos.y ? hitBlox.pos.y - g.bloxDistMin1 : hitBlox.pos.y + g.bloxDistMin1);
+      if (!hitBlox.mover) {
+        potNewY = rest;
+        aBlox.vel.y = 0;
+        pinnedY = true;
+        stoppedy += 1;
+        return;
+      }
+      if (pinnedY) {
+        aBlox.vel.y = 0;
+        stoppedy += 1;
+        return;
+      }
+      potNewY = rest;
+      aBlox.vel.y = hitBlox.vel.y;
       if (aBlox.vel.y === 0) stoppedy += 1;
     };
 
     const resolveX = () => {
       if (potNewX > g.RIGHT) {
-        potNewX = g.RIGHT; aBlox.vel.x = 0; stoppedx += 1; aBlox.movingx = 0;
+        potNewX = g.RIGHT; aBlox.vel.x = 0; stoppedx += 1; aBlox.movingx = 0; pinnedX = true;
       } else if (potNewX < g.LEFT) {
-        potNewX = g.LEFT; aBlox.vel.x = 0; stoppedx += 1; aBlox.movingx = 0;
+        potNewX = g.LEFT; aBlox.vel.x = 0; stoppedx += 1; aBlox.movingx = 0; pinnedX = true;
       } else {
         g.field.giveMeListOfBloxInTheFieldPointsFor(potNewX, aBlox.pos.y, fieldBlox);
         for (let i = 0; i < fieldBlox.length; i++) {
@@ -232,9 +260,9 @@ class BloxPhysics {
 
     const resolveY = () => {
       if (potNewY > g.BOTTOM) {
-        potNewY = g.BOTTOM; aBlox.vel.y = 0; stoppedy += 1; aBlox.movingy = 0;
+        potNewY = g.BOTTOM; aBlox.vel.y = 0; stoppedy += 1; aBlox.movingy = 0; pinnedY = true;
       } else if (potNewY < g.TOP) {
-        potNewY = g.TOP; aBlox.vel.y = 0; stoppedy += 1; aBlox.movingy = 0;
+        potNewY = g.TOP; aBlox.vel.y = 0; stoppedy += 1; aBlox.movingy = 0; pinnedY = true;
       } else {
         g.field.giveMeListOfBloxInTheFieldPointsFor(aBlox.pos.x, potNewY, fieldBlox);
         for (let i = 0; i < fieldBlox.length; i++) {
