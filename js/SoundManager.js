@@ -17,7 +17,7 @@ class SoundManager {
 
   mute() {
     this._muted = true;
-    Object.keys(this.clips).forEach((name) => this.stopSound(name));
+    this.stopAll();
   }
 
   unmute() {
@@ -76,7 +76,12 @@ class SoundManager {
   stopSound(name) {
     const a = this.clips[name];
     if (!a) return;
+    a.loop = false;
     a.pause();
     try { a.currentTime = 0; } catch (err) {}
+  }
+
+  stopAll() {
+    Object.keys(this.clips).forEach((name) => this.stopSound(name));
   }
 }

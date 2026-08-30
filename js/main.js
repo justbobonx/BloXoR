@@ -21,6 +21,12 @@ function resize() {
   game.resize(cssW, cssH);
 }
 
+function onBackground() {
+  if (document.visibilityState === 'visible') return;
+  game.saveGame();
+  game.onLostFocus();
+}
+
 window.applyStage = applyStage;
 window.resizeGame = resize;
 
@@ -28,16 +34,8 @@ window.addEventListener('resize', resize);
 window.addEventListener('orientationchange', () => setTimeout(resize, 200));
 document.addEventListener('fullscreenchange', resize);
 document.addEventListener('webkitfullscreenchange', resize);
-window.addEventListener('pagehide', () => {
-  game.saveGame();
-  game.onLostFocus();
-});
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'hidden') {
-    game.saveGame();
-    game.onLostFocus();
-  }
-});
+window.addEventListener('pagehide', onBackground);
+document.addEventListener('visibilitychange', onBackground);
 
 game.boot().then(() => {
   resize();
