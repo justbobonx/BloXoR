@@ -28,7 +28,7 @@ class BloXor {
     this.BLOX_SPEED = 22;
     this.BLOX_FRICTION_MIN = 0.1;
     this.BLOX_FRICTION_RANGE = 0.85;
-    this.TILT_FRICTION_MIN = 0.62;
+    this.TILT_FRICTION_MIN = 0.55;
     this.TILT_FRICTION_RANGE = 0.30;
     this.STICK_FRICTION = 0.88;
     this.BLOX_POS_PRECISION = 100;    

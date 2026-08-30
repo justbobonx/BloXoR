@@ -9,7 +9,7 @@ class BloxInput {
     this.holdWorld = null;
     this.FLAT_SPAN = 0.03;
     this.FLAT_START = 0.01;
-    this.TILT_GAIN = 1.5;
+    this.TILT_GAIN = 1.4;
     this.LONG_PRESS_MS = 550;
     this.KEY_TILT = 0.12;
     this.KEY_TILT_HARD = 0.26;
