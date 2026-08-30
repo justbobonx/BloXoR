@@ -265,7 +265,13 @@ class BloXor {
     } catch (err) {}
   }
 
+  silenceAudio() {
+    this.soundManager.stopAll();
+    this.lastAnyMoving = 0;
+  }
+
   onLostFocus() {
+    this.silenceAudio();
     if (this.ui.gateOpen()) return;
     const playing = this.gameState === GameState.InPlay || this.gameState === GameState.WaitToStartNewLevel;
     if (playing && !this.ui.menuOpen()) {
@@ -755,6 +761,7 @@ class BloXorUI {
   }
 
   showPause() {
+    this.g.silenceAudio();
     this.g.cancelInteract();
     this.hideMenus();
     document.getElementById('pauseScreen').classList.remove('hidden');
