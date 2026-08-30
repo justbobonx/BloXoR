@@ -34,12 +34,11 @@ class BloxInput {
     this.tiltBusy = false;
     this.lastTiltAt = 0;
     this.lastMotionWasGravity = false;
-    this.lastdx = 0;
-    this.lastdy = 0;
-    this.lastdz = 0;
-    this.lastdx2 = 0;
-    this.lastdy2 = 0;
-    this.lastdz2 = 0;
+    this.TILT_EMA = 0.12;
+    this.emaX = 0;
+    this.emaY = 0;
+    this.emaZ = 1;
+    this.emaInited = false;
     this.onMotion = (e) => this.handleMotion(e);
     this.onOrient = (e) => this.handleOrientation(e);
   }
@@ -304,13 +303,25 @@ class BloxInput {
     const g = this.g;
     if (g.ui.menuOpen() || g.waitingOnAct || this.usingManual()) return;
 
-    let downx = (accx + this.lastdx + this.lastdx2) / 3;
-    let downy = (accy + this.lastdy + this.lastdy2) / 3;
-    let downz = (accz + this.lastdz + this.lastdz2) / 3;
-
     accx = Math.max(-1, Math.min(1, accx));
     accy = Math.max(-1, Math.min(1, accy));
     accz = Math.max(-1, Math.min(1, accz));
+
+    if (!this.emaInited) {
+      this.emaX = accx;
+      this.emaY = accy;
+      this.emaZ = accz;
+      this.emaInited = true;
+    } else {
+      const a = this.TILT_EMA;
+      this.emaX += a * (accx - this.emaX);
+      this.emaY += a * (accy - this.emaY);
+      this.emaZ += a * (accz - this.emaZ);
+    }
+
+    let downx = this.emaX;
+    let downy = this.emaY;
+    let downz = this.emaZ;
 
     if (Math.abs(downx) < this.FLAT_SPAN) downx = 0;
     else if (downx > 0) downx -= this.FLAT_START;
@@ -318,13 +329,6 @@ class BloxInput {
     if (Math.abs(downy) < this.FLAT_SPAN) downy = 0;
     else if (downy > 0) downy -= this.FLAT_START;
     else downy += this.FLAT_START;
-
-    this.lastdx2 = this.lastdx;
-    this.lastdy2 = this.lastdy;
-    this.lastdz2 = this.lastdz;
-    this.lastdx = accx;
-    this.lastdy = accy;
-    this.lastdz = accz;
 
     g.downx = downx * this.TILT_GAIN;
     g.downy = downy * this.TILT_GAIN;
