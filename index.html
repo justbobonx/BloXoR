@@ -9,16 +9,38 @@
   <title>BloXoR</title>
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="assets/images/icon.png" type="image/png">
+  <style>
+    html, body { margin: 0; background: #000; height: 100%; overflow: hidden; }
+    #orientGate {
+      position: absolute;
+      inset: 0;
+      z-index: 80;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #orientGate img {
+      display: block;
+      width: min(72%, 340px);
+      height: auto;
+      image-rendering: pixelated;
+    }
+    #orientGate.hidden { display: none !important; }
+  </style>
   <script>
-    window.VERSION = '0.3.20';
+    window.VERSION = '0.3.21';
     document.write('<link rel="stylesheet" href="css/style.css?v=' + window.VERSION + '">');
+    if (window.innerHeight > window.innerWidth) {
+      document.documentElement.classList.add('stage-swap');
+    }
   </script>
 </head>
 <body>
   <div id="game-container">
     <canvas id="gameCanvas"></canvas>
 
-    <div id="orientGate" class="hidden">
+    <div id="orientGate">
       <img src="assets/images/BloXor-Title.png" alt="BloXoR">
     </div>
 

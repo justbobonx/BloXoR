@@ -35,4 +35,5 @@ document.addEventListener('visibilitychange', () => {
 
 game.boot().then(() => {
   resize();
+  game.ui.hideGate();
 });
