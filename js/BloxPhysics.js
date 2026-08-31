@@ -195,9 +195,20 @@ class BloxPhysics {
     let stoppedy = 0;
     let pinnedX = false;
     let pinnedY = false;
+    const WIGGLE = 1.96;
+    const slip = g.bloxDistMin1 - WIGGLE;
 
     const glueX = (hitBlox) => {
+      const dify = Math.abs(hitBlox.pos.y - aBlox.pos.y);
       const rest = q(potNewX <= hitBlox.pos.x ? hitBlox.pos.x - g.bloxDistMin1 : hitBlox.pos.x + g.bloxDistMin1);
+      // Side-path lip: still a bump, but snapping to hit.pos±40 yanks X every time Y crosses 1.96.
+      if (dify >= slip - 2) {
+        if (Math.abs(potNewX - hitBlox.pos.x) < Math.abs(aBlox.pos.x - hitBlox.pos.x)) potNewX = q(aBlox.pos.x);
+        aBlox.vel.x = 0;
+        if (!hitBlox.mover) pinnedX = true;
+        stoppedx += 1;
+        return;
+      }
       if (!hitBlox.mover) {
         potNewX = rest;
         aBlox.vel.x = 0;
@@ -215,7 +226,15 @@ class BloxPhysics {
       if (aBlox.vel.x === 0) stoppedx += 1;
     };
     const glueY = (hitBlox) => {
+      const difx = Math.abs(hitBlox.pos.x - aBlox.pos.x);
       const rest = q(potNewY <= hitBlox.pos.y ? hitBlox.pos.y - g.bloxDistMin1 : hitBlox.pos.y + g.bloxDistMin1);
+      if (difx >= slip - 2) {
+        if (Math.abs(potNewY - hitBlox.pos.y) < Math.abs(aBlox.pos.y - hitBlox.pos.y)) potNewY = q(aBlox.pos.y);
+        aBlox.vel.y = 0;
+        if (!hitBlox.mover) pinnedY = true;
+        stoppedy += 1;
+        return;
+      }
       if (!hitBlox.mover) {
         potNewY = rest;
         aBlox.vel.y = 0;
