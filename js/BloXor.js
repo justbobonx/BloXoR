@@ -468,7 +468,16 @@ class BloXorUI {
     document.getElementById('ld_back').addEventListener('click', () => this.closeDetail());
     document.getElementById('ld_play').addEventListener('click', () => { g.enterPlayChrome().then(() => g.playLevel(g.curPuzzleInd)); });
     document.getElementById('sc_ok').addEventListener('click', () => { this.closeScore(); g.enterPlayChrome().then(() => this.showLevelSelect()); });
+    document.getElementById('game-container').addEventListener('pointerdown', (e) => {
+      if (!this.visible('pauseScreen')) return;
+      const panel = document.getElementById('pauseScreen');
+      if (panel && !panel.contains(e.target)) g.resumePlay();
+    });
     this.syncMute();
+  }
+  formatScore(n) {
+    const v = Math.trunc(Number(n) || 0);
+    return String(v).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }
   menuOpen() { return !!this.menuLayer(); }
   gateOpen() { return this.visible('orientGate'); }
@@ -547,7 +556,7 @@ class BloXorUI {
     g.gameState = GameState.NoDraw;
     this.hideMenus();
     const tot = g.totTime;
-    document.getElementById('ls_tot').textContent = String(g.totScore);
+    document.getElementById('ls_tot').textContent = this.formatScore(g.totScore);
     document.getElementById('ls_open').textContent = String(g.lvlsOpen);
     document.getElementById('ls_beat').textContent = String(g.lvlsBeat);
     document.getElementById('ls_time').textContent = Math.floor(tot / 3600) + ':' + String(Math.floor((tot / 60) % 60)).padStart(2, '0') + ':' + String(Math.floor(tot % 60 + 0.5)).padStart(2, '0');
@@ -565,7 +574,7 @@ class BloXorUI {
       mark.src = ld.beaten ? 'assets/images/blx_x.png' : 'assets/images/blx_o.png';
       const num = document.createElement('span'); num.className = 'ls-num'; num.textContent = String(i + 1);
       const name = document.createElement('span'); name.className = 'ls-name'; name.textContent = ld.opened ? ld.name : '???';
-      const score = document.createElement('span'); score.className = 'ls-score'; score.textContent = ld.beaten ? String(ld.score) : '---';
+      const score = document.createElement('span'); score.className = 'ls-score'; score.textContent = ld.beaten ? this.formatScore(ld.score) : '---';
       row.appendChild(mark); row.appendChild(num); row.appendChild(name); row.appendChild(score);
       row.addEventListener('click', () => this.showDetail(i));
       list.appendChild(row);
@@ -598,7 +607,7 @@ class BloXorUI {
         const tsec = String(Math.floor(ld.seconds % 60)).padStart(2, '0');
         const pmin = Math.floor(ld.timePlayed / 60);
         const psec = String(Math.floor(ld.timePlayed % 60)).padStart(2, '0');
-        const cells = [['Hi Score', String(ld.score)], ['Low Time', tmin + ':' + tsec], ['Low Tilts', String(ld.moves)], ['First Beat', ld.formattedDateTime(ld.firstBeat)], ['Tot Plays', String(ld.playCount)], ['Total Time', pmin + ':' + psec]];
+        const cells = [['Hi Score', this.formatScore(ld.score)], ['Low Time', tmin + ':' + tsec], ['Low Tilts', String(ld.moves)], ['First Beat', ld.formattedDateTime(ld.firstBeat)], ['Tot Plays', String(ld.playCount)], ['Total Time', pmin + ':' + psec]];
         stats.innerHTML = cells.map((pair) => '<div class="ld-stat"><span>' + pair[0] + '</span><b>' + pair[1] + '</b></div>').join('');
       } else {
         desc.classList.remove('hidden'); desc.innerHTML = ld.getDescriptionHtml();
@@ -632,7 +641,7 @@ class BloXorUI {
   showScore(cur, rec) {
     document.getElementById('sc_title').textContent = rec && rec.title ? rec.title : 'Level done';
     const had = !!(rec && rec.hadPrev);
-    this.fillStat('sc_score', 'Score', String(cur.score), !!(rec && rec.scoreBest), had && rec.scoreBest ? String(rec.prevScore) : null);
+    this.fillStat('sc_score', 'Score', this.formatScore(cur.score), !!(rec && rec.scoreBest), had && rec.scoreBest ? this.formatScore(rec.prevScore) : null);
     this.fillStat('sc_time', 'Time', this.formatClock(cur.seconds), !!(rec && rec.timeBest), had && rec.timeBest ? this.formatClock(rec.prevSeconds) : null);
     this.fillStat('sc_moves', 'Tilts', String(cur.moves), !!(rec && rec.movesBest), had && rec.movesBest ? String(rec.prevMoves) : null);
     document.getElementById('scoreView').classList.remove('hidden');
