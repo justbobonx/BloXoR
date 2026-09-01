@@ -138,13 +138,34 @@ button.ui-focus,
   overflow: auto;
 }
 
+.panel.compact {
+  inset: auto;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(240px, 72%);
+  height: auto;
+  padding: 10px 12px;
+  overflow: visible;
+}
+
 .panel-title {
   font-size: 1.25rem;
   margin-bottom: 8px;
 }
 
-#ld_name {
+#ld_name,
+#ps_title {
   text-align: center;
+}
+
+#ps_title {
+  font-size: 1rem;
+  margin-bottom: 8px;
+}
+
+#pauseScreen .col {
+  margin-top: 0;
 }
 
 #ls_stats {
@@ -260,7 +281,9 @@ button.ui-focus,
 #ld_stats {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 4px 16px;
+  grid-template-rows: auto auto auto;
+  grid-auto-flow: column;
+  gap: 4px 24px;
   font-size: 0.88rem;
   line-height: 1.35;
   opacity: 0.9;
@@ -268,8 +291,9 @@ button.ui-focus,
 
 .ld-stat {
   display: flex;
-  justify-content: space-between;
-  gap: 8px;
+  justify-content: flex-start;
+  align-items: baseline;
+  gap: 6px;
   min-width: 0;
 }
 
@@ -280,7 +304,6 @@ button.ui-focus,
 
 .ld-stat b {
   font-weight: 600;
-  text-align: right;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
