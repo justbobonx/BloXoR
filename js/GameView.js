@@ -95,7 +95,11 @@ class GameView {
       g.iaHilite.draw(ctx);
     }
 
-    if (g.gameState === GameState.WaitToStartNewLevel) {
+    if (g.gameState === GameState.WaitToStartNewLevel && !g.input.usingTiltControl()) {
+      g.startFromWait(false);
+    }
+
+    if (g.gameState === GameState.WaitToStartNewLevel && g.input.usingTiltControl()) {
       if (this.waitState !== g.gameState) {
         this.waitState = g.gameState;
         this.waitFlatSince = 0;
