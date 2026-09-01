@@ -671,16 +671,14 @@ class BloXorUI {
     g.gameState = GameState.NoDraw;
     this.hideMenus();
     const tot = g.totTime;
-    const timeStr =
+    document.getElementById('ls_tot').textContent = String(g.totScore);
+    document.getElementById('ls_open').textContent = String(g.lvlsOpen);
+    document.getElementById('ls_beat').textContent = String(g.lvlsBeat);
+    document.getElementById('ls_time').textContent =
       Math.floor(tot / 3600) + ':' +
       String(Math.floor((tot / 60) % 60)).padStart(2, '0') + ':' +
       String(Math.floor(tot % 60 + 0.5)).padStart(2, '0');
-    document.getElementById('ls_stats').textContent =
-      'SCORE: ' + g.totScore +
-      ' · Lvls Open: ' + g.lvlsOpen +
-      ' · Lvls Comp: ' + g.lvlsBeat +
-      ' · Tot Time: ' + timeStr +
-      ' · Tot Plays: ' + g.totGamesPlayed;
+    document.getElementById('ls_plays').textContent = String(g.totGamesPlayed);
 
     const list = document.getElementById('ls_list');
     list.innerHTML = '';
@@ -689,10 +687,29 @@ class BloXorUI {
       const row = document.createElement('button');
       row.className = 'ls-row' + (ld.opened ? '' : ' locked');
       row.type = 'button';
-      const mark = ld.beaten ? 'X' : ld.opened ? '\u25cf' : ' ';
-      const score = ld.beaten ? String(ld.score) : '---';
-      const name = ld.opened ? ld.name : '???';
-      row.textContent = mark + '  ' + (i + 1) + '  ' + name + '   ' + score;
+
+      const mark = document.createElement('img');
+      mark.className = 'ls-mark' + (ld.opened ? '' : ' empty');
+      mark.alt = '';
+      if (ld.beaten) mark.src = 'assets/images/blx_x.png';
+      else mark.src = 'assets/images/blx_o.png';
+
+      const num = document.createElement('span');
+      num.className = 'ls-num';
+      num.textContent = String(i + 1);
+
+      const name = document.createElement('span');
+      name.className = 'ls-name';
+      name.textContent = ld.opened ? ld.name : '???';
+
+      const score = document.createElement('span');
+      score.className = 'ls-score';
+      score.textContent = ld.beaten ? String(ld.score) : '---';
+
+      row.appendChild(mark);
+      row.appendChild(num);
+      row.appendChild(name);
+      row.appendChild(score);
       row.addEventListener('click', () => this.showDetail(i));
       list.appendChild(row);
     }
@@ -716,8 +733,10 @@ class BloXorUI {
     if (!ld.opened) {
       thumb.style.display = 'none';
       thumb.removeAttribute('src');
+      desc.classList.remove('hidden');
       desc.textContent = '???';
       stats.classList.add('hidden');
+      stats.innerHTML = '';
       play.disabled = true;
       play.textContent = 'Locked';
     } else {
@@ -728,21 +747,28 @@ class BloXorUI {
 
       if (ld.beaten) {
         desc.innerHTML = '';
+        desc.classList.add('hidden');
         stats.classList.remove('hidden');
         const tmin = Math.floor(ld.seconds / 60);
         const tsec = String(Math.floor(ld.seconds % 60)).padStart(2, '0');
         const pmin = Math.floor(ld.timePlayed / 60);
         const psec = String(Math.floor(ld.timePlayed % 60)).padStart(2, '0');
-        stats.innerHTML =
-          'Hi Score: ' + ld.score +
-          '<br>Low Time: ' + tmin + ':' + tsec +
-          '<br>Low Tilts: ' + ld.moves +
-          '<br>First Beat: ' + ld.formattedDateTime(ld.firstBeat) +
-          '<br>Total Plays: ' + ld.playCount +
-          '<br>Total Time: ' + pmin + ':' + psec;
+        const cells = [
+          ['Hi Score', String(ld.score)],
+          ['Low Time', tmin + ':' + tsec],
+          ['Low Tilts', String(ld.moves)],
+          ['First Beat', ld.formattedDateTime(ld.firstBeat)],
+          ['Total Plays', String(ld.playCount)],
+          ['Total Time', pmin + ':' + psec]
+        ];
+        stats.innerHTML = cells.map((pair) => {
+          return '<div class="ld-stat"><span>' + pair[0] + '</span><b>' + pair[1] + '</b></div>';
+        }).join('');
       } else {
+        desc.classList.remove('hidden');
         desc.innerHTML = ld.getDescriptionHtml();
         stats.classList.add('hidden');
+        stats.innerHTML = '';
       }
       play.disabled = false;
       play.textContent = 'Play';
