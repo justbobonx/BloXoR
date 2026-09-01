@@ -457,10 +457,6 @@ class BloXorUI {
       document.getElementById('startScreen').classList.add('hidden');
       g.enterPlayChrome().then(() => this.showLevelSelect());
     });
-    document.getElementById('continueButton').addEventListener('click', () => {
-      document.getElementById('startScreen').classList.add('hidden');
-      g.enterPlayChrome().then(() => this.showLevelSelect());
-    });
     document.getElementById('ps_resume').addEventListener('click', () => g.resumePlay());
     document.getElementById('ps_restart').addEventListener('click', () => g.restartLevel());
     document.getElementById('ps_menu').addEventListener('click', () => { g.enterPlayChrome().then(() => this.showLevelSelect()); });
@@ -495,7 +491,7 @@ class BloXorUI {
   collectFocus() {
     const layer = this.menuLayer();
     let ids = [];
-    if (layer === 'start') ids = ['newGameButton', 'continueButton'];
+    if (layer === 'start') ids = ['newGameButton'];
     else if (layer === 'select') {
       this.focusEls = Array.prototype.slice.call(document.querySelectorAll('#ls_list .ls-row'));
       this.clampFocus(); this.paintFocus(false); return;
@@ -534,11 +530,6 @@ class BloXorUI {
   }
   activateFocus() { const el = this.focusEls[this.focusIndex]; if (el && !el.disabled) el.click(); }
   showStart() {
-    const cont = document.getElementById('continueButton');
-    const hasProgress = this.g.lvlsBeat > 0 || this.g.levelData.some((l) => l.playCount > 0);
-    cont.disabled = !hasProgress;
-    cont.classList.toggle('hidden', !hasProgress);
-    document.getElementById('startScreen').classList.remove('hidden');
     this.hideMenus();
     document.getElementById('startScreen').classList.remove('hidden');
     this.focusIndex = 0; this.collectFocus(); this.g.input.absorbButtons();
@@ -581,7 +572,9 @@ class BloXorUI {
     }
     document.getElementById('levelSelect').classList.remove('hidden');
     this.focusIndex = Math.max(0, Math.min(g.curPuzzleInd, g.levelData.length - 1));
-    this.collectFocus(); g.input.absorbButtons();
+    this.collectFocus();
+    requestAnimationFrame(() => this.scrollListToFocus());
+    g.input.absorbButtons();
   }
   showDetail(i) {
     const g = this.g;
@@ -620,7 +613,16 @@ class BloXorUI {
   }
   closeDetail() {
     document.getElementById('levelDetail').classList.add('hidden');
-    this.focusIndex = this.g.curPuzzleInd; this.collectFocus(); this.g.input.absorbButtons();
+    this.focusIndex = this.g.curPuzzleInd; this.collectFocus(); requestAnimationFrame(() => this.scrollListToFocus()); this.g.input.absorbButtons();
+  }
+  scrollListToFocus() {
+    const list = document.getElementById('ls_list');
+    const el = this.focusEls[this.focusIndex];
+    if (!list || !el) return;
+    const lr = list.getBoundingClientRect();
+    const er = el.getBoundingClientRect();
+    const delta = (er.top + er.height / 2) - (lr.top + lr.height / 2);
+    list.scrollTop += delta;
   }
   detailOpen() { return this.visible('levelDetail'); }
   showPause() {
