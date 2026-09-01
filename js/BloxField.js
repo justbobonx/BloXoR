@@ -80,19 +80,23 @@ class BloxField {
     }
   }
 
-  // Collision query: a face at exact bloxDistMin1 lives in the neighboring cell.
-  // Occupancy writes stay on giveMeListOfFieldPointsFor; only hits need the extra cells.
   giveMeListOfBloxInTheFieldPointsFor(x, y, list) {
     const g = this.g;
     list.length = 0;
     const fieldlocx = Math.trunc((x - g.LEFT) / g.bloxDist);
     const fieldlocy = Math.trunc((y - g.TOP) / g.bloxDist);
-    for (let dx = -1; dx <= 1; dx++) {
-      for (let dy = -1; dy <= 1; dy++) {
-        const cx = fieldlocx + dx;
-        const cy = fieldlocy + dy;
-        if (this._valid(cx, cy)) this._addAll(list, this.field[cx][cy]);
-      }
+    const fieldlocxOff = this._cellOff(x - g.LEFT);
+    const fieldlocyOff = this._cellOff(y - g.TOP);
+    if (!this._valid(fieldlocx, fieldlocy)) return;
+    this._addAll(list, this.field[fieldlocx][fieldlocy]);
+    if (fieldlocxOff > 0 && fieldlocx + 1 < g.BLoxCntX && this._valid(fieldlocx + 1, fieldlocy)) {
+      this._addAll(list, this.field[fieldlocx + 1][fieldlocy]);
+    }
+    if (fieldlocyOff > 0 && fieldlocy + 1 < g.BLoxCntY && this._valid(fieldlocx, fieldlocy + 1)) {
+      this._addAll(list, this.field[fieldlocx][fieldlocy + 1]);
+    }
+    if (fieldlocxOff > 0 && fieldlocx + 1 < g.BLoxCntX && fieldlocyOff > 0 && fieldlocy + 1 < g.BLoxCntY) {
+      this._addAll(list, this.field[fieldlocx + 1][fieldlocy + 1]);
     }
   }
 
