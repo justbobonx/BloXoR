@@ -758,7 +758,7 @@ class BloXorUI {
           ['Low Time', tmin + ':' + tsec],
           ['Low Tilts', String(ld.moves)],
           ['First Beat', ld.formattedDateTime(ld.firstBeat)],
-          ['Total Plays', String(ld.playCount)],
+          ['Tot Plays', String(ld.playCount)],
           ['Total Time', pmin + ':' + psec]
         ];
         stats.innerHTML = cells.map((pair) => {
@@ -796,6 +796,9 @@ class BloXorUI {
     this.g.cancelInteract();
     this.hideMenus();
     this.syncMute();
+    const ld = this.g.levelData[this.g.curPuzzleInd];
+    const title = document.getElementById('ps_title');
+    title.textContent = ld ? ld.indexSpaceName : '';
     document.getElementById('pauseScreen').classList.remove('hidden');
     this.focusIndex = 0;
     this.collectFocus();
