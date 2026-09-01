@@ -600,7 +600,7 @@ class BloXorUI {
         const tsec = String(Math.floor(ld.seconds % 60)).padStart(2, '0');
         const pmin = Math.floor(ld.timePlayed / 60);
         const psec = String(Math.floor(ld.timePlayed % 60)).padStart(2, '0');
-        const cells = [['Hi Score', this.formatScore(ld.score)], ['Low Time', tmin + ':' + tsec], ['Low Tilts', String(ld.moves)], ['First Beat', ld.formattedDateTime(ld.firstBeat)], ['Tot Plays', String(ld.playCount)], ['Total Time', pmin + ':' + psec]];
+        const cells = [['Hi Score', this.formatScore(ld.score)], ['Low Time', tmin + ':' + tsec], ['Low Tilts', String(ld.moves)], ['First Beat', ld.formattedDate(ld.firstBeat)], ['Tot Plays', String(ld.playCount)], ['Total Time', pmin + ':' + psec]];
         stats.innerHTML = cells.map((pair) => '<div class="ld-stat"><span>' + pair[0] + '</span><b>' + pair[1] + '</b></div>').join('');
       } else {
         desc.classList.remove('hidden'); desc.innerHTML = ld.getDescriptionHtml();
