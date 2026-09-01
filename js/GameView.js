@@ -148,12 +148,12 @@ class GameView {
     if (g.gameState !== GameState.InPlay && g.gameState !== GameState.WaitToStartNewLevel && g.gameState !== GameState.LevelBeat) return;
     ctx.save();
     ctx.globalAlpha = 1;
-    ctx.fillStyle = '#fff';
+    ctx.fillStyle = '#ddc';
     const fontPx = Math.max(12, Math.round(this.canvas.height * 0.035));
     const hintPx = Math.max(9, Math.round(fontPx * 0.72));
-    const shadow = Math.max(2, Math.round(fontPx * 0.18));
+    const shadow = Math.max(1, Math.round(fontPx * 0.08));
     ctx.shadowColor = '#000';
-    ctx.shadowBlur = 0;
+    ctx.shadowBlur = shadow/1.5;
     ctx.shadowOffsetX = shadow;
     ctx.shadowOffsetY = shadow;
     ctx.font = fontPx + 'px sans-serif';
@@ -167,7 +167,7 @@ class GameView {
     ctx.fillText('TILTS ' + g.curLvlData.moves + '  TIME ' + t, this.canvas.width - pad, pad);
     ctx.font = hintPx + 'px sans-serif';
     ctx.textAlign = 'center';
-    ctx.textBaseline = 'bottom';
+    ctx.textBaseline = 'bottom';    
     ctx.fillText('long press for menu', this.canvas.width / 2, this.canvas.height - pad);
     ctx.restore();
   }
