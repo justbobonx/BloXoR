@@ -29,7 +29,7 @@
     #orientGate.hidden { display: none !important; }
   </style>
   <script>
-    window.VERSION = '0.3.21';
+    window.VERSION = '0.3.22';
     document.write('<link rel="stylesheet" href="css/style.css?v=' + window.VERSION + '">');
     if (window.innerHeight > window.innerWidth) {
       document.documentElement.classList.add('stage-swap');
@@ -58,16 +58,8 @@
     <div id="playHud" class="hidden"></div>
 
     <div id="levelSelect" class="panel hidden">
-      <div class="panel-title">Levels</div>
-      <div id="ls_stats">
-        <div id="ls_tot">0</div>
-        <div id="ls_beat"></div>
-        <div id="ls_open"></div>
-        <div id="ls_time"></div>
-        <div id="ls_plays"></div>
-      </div>
+      <div id="ls_stats"></div>
       <div id="ls_list"></div>
-      <button type="button" id="sb_mute">sound on</button>
     </div>
 
     <div id="levelDetail" class="panel hidden">
@@ -87,6 +79,7 @@
         <button type="button" id="ps_resume">Resume</button>
         <button type="button" id="ps_restart">Restart</button>
         <button type="button" id="ps_menu">Level select</button>
+        <button type="button" id="ps_mute">sound on</button>
       </div>
     </div>
 
