@@ -269,6 +269,27 @@ class BloxInput {
     return this.pointerDown || this.anyDirKey() || !!this.readStick();
   }
 
+  hasGravityTilt() {
+    return this.lastMotionWasGravity && this.lastTiltAt > 0;
+  }
+
+  preferManualControl() {
+    return !!this.currentPad() || this.anyDirKey();
+  }
+
+  usingTiltControl() {
+    if (this.preferManualControl() || this.tiltDenied) return false;
+    if (!this.hasGravityTilt()) return false;
+    if (window.matchMedia) {
+      try {
+        const fine = window.matchMedia('(pointer: fine)').matches;
+        const coarse = window.matchMedia('(pointer: coarse)').matches;
+        if (fine && !coarse) return false;
+      } catch (err) {}
+    }
+    return true;
+  }
+
   anyDirKey() {
     return !!(this.keys.ArrowLeft || this.keys.ArrowRight || this.keys.ArrowUp || this.keys.ArrowDown ||
       this.keys.KeyA || this.keys.KeyD || this.keys.KeyW || this.keys.KeyS);
@@ -360,6 +381,11 @@ class BloxInput {
       this.g.downx = 0;
       this.g.downy = 0;
       return;
+    }
+    if (this.g.gameState === GameState.WaitToStartNewLevel) {
+      if (!this.usingTiltControl() || this.anyDirKey() || this.readStick()) {
+        this.g.startFromWait(true);
+      }
     }
     if (this.g.waitingOnAct) {
       this.g.downx = 0;
