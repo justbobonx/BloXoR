@@ -13,9 +13,11 @@ class BloxInput {
     this.LONG_PRESS_MS = 550;
     this.KEY_TILT = 0.12;
     this.KEY_TILT_HARD = 0.26;
-    this.MOUSE_MAX = 0.25;
     this.MOUSE_DEAD_PX = 10;
-    this.MOUSE_FULL_PX = 90;
+    this.keysOn = false;
+    try {
+      this.keysOn = new URLSearchParams(window.location.search).get('keysOn') === '1';
+    } catch (err) {}
     this.joyLev = 0.20;
     this.joyPow = 0.12;
     this.MENU_STICK = 0.55;
@@ -106,11 +108,11 @@ class BloxInput {
           return;
         }
       }
-      if (!g.ui.menuOpen() && !g.waitingOnAct) this.applyKeys();
+      if (this.keysOn && !g.ui.menuOpen() && !g.waitingOnAct) this.applyKeys();
     });
     window.addEventListener('keyup', (e) => {
       this.keys[e.code] = false;
-      if (!g.ui.menuOpen() && !g.waitingOnAct) this.applyKeys();
+      if (this.keysOn && !g.ui.menuOpen() && !g.waitingOnAct) this.applyKeys();
     });
 
     window.addEventListener('gamepadconnected', (e) => {
@@ -291,6 +293,7 @@ class BloxInput {
   }
 
   anyDirKey() {
+    if (!this.keysOn) return false;
     return !!(this.keys.ArrowLeft || this.keys.ArrowRight || this.keys.ArrowUp || this.keys.ArrowDown ||
       this.keys.KeyA || this.keys.KeyD || this.keys.KeyW || this.keys.KeyS);
   }
@@ -537,7 +540,7 @@ class BloxInput {
 
   applyKeys() {
     const g = this.g;
-    if (this.pointerDown || g.ui.menuOpen() || g.waitingOnAct) return;
+    if (!this.keysOn || this.pointerDown || g.ui.menuOpen() || g.waitingOnAct) return;
     const hard = this.keys.ShiftLeft || this.keys.ShiftRight;
     const mag = hard ? this.KEY_TILT_HARD : this.KEY_TILT;
     let x = 0;
@@ -598,18 +601,6 @@ class BloxInput {
         this.pointerDragged = true;
         this.clearHold();
       }
-      if (!g.waitingOnAct) {
-        if (dist < this.MOUSE_DEAD_PX) {
-          g.downx = 0;
-          g.downy = 0;
-        } else {
-          const reach = Math.min(1, (dist - this.MOUSE_DEAD_PX) / this.MOUSE_FULL_PX);
-          const scale = (this.MOUSE_MAX * reach) / dist;
-          g.downx = dx * scale;
-          g.downy = dy * scale;
-        }
-        g.updateMoveCnt();
-      }
       return;
     }
 
@@ -625,14 +616,10 @@ class BloxInput {
         } else {
           g.physics.blowUpBlox(bomb);
         }
-        g.downx = 0;
-        g.downy = 0;
         return;
       }
     }
 
-    g.downx = 0.0;
-    g.downy = 0.0;
-    this.applyKeys();
+    if (this.keysOn) this.applyKeys();
   }
 }
