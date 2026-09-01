@@ -29,7 +29,7 @@
     #orientGate.hidden { display: none !important; }
   </style>
   <script>
-    window.VERSION = '0.3.22';
+    window.VERSION = '0.3.23';
     document.write('<link rel="stylesheet" href="css/style.css?v=' + window.VERSION + '">');
     if (window.innerHeight > window.innerWidth) {
       document.documentElement.classList.add('stage-swap');
@@ -58,7 +58,28 @@
     <div id="playHud" class="hidden"></div>
 
     <div id="levelSelect" class="panel hidden">
-      <div id="ls_stats"></div>
+      <div id="ls_stats">
+        <div class="ls-stat">
+          <div class="ls-stat-label">SCORE</div>
+          <div id="ls_tot" class="ls-stat-val">0</div>
+        </div>
+        <div class="ls-stat">
+          <div class="ls-stat-label">Lvls Open</div>
+          <div id="ls_open" class="ls-stat-val">0</div>
+        </div>
+        <div class="ls-stat">
+          <div class="ls-stat-label">Lvls Comp</div>
+          <div id="ls_beat" class="ls-stat-val">0</div>
+        </div>
+        <div class="ls-stat">
+          <div class="ls-stat-label">Tot Time</div>
+          <div id="ls_time" class="ls-stat-val">0:00:00</div>
+        </div>
+        <div class="ls-stat">
+          <div class="ls-stat-label">Tot Plays</div>
+          <div id="ls_plays" class="ls-stat-val">0</div>
+        </div>
+      </div>
       <div id="ls_list"></div>
     </div>
 
@@ -67,7 +88,7 @@
       <img id="ld_thumb" alt="">
       <div id="ld_desc"></div>
       <div id="ld_stats" class="hidden"></div>
-      <div class="row">
+      <div class="row row-center">
         <button type="button" id="ld_back">Back</button>
         <button type="button" id="ld_play">Play</button>
       </div>
