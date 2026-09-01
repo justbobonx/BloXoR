@@ -170,8 +170,8 @@ class GameView {
     const fontPx = Math.max(12, Math.round(this.canvas.height * 0.035));
     const hintPx = Math.max(9, Math.round(fontPx * 0.72));
     const pad = 10;
-    const chipPadX = Math.max(6, Math.round(fontPx * 0.35));
     const chipPadY = Math.max(3, Math.round(fontPx * 0.18));
+    const chipPadX = pad;
     const radius = Math.max(4, Math.round(fontPx * 0.28));
 
     ctx.font = fontPx + 'px sans-serif';
@@ -183,10 +183,11 @@ class GameView {
     const scoreW = ctx.measureText(scoreText).width;
     const rightW = ctx.measureText(rightText).width;
     const lineH = fontPx;
+    const chipH = lineH + chipPadY * 2 - 1;
 
-    ctx.fillStyle = 'rgba(0,0,0,0.5)';
-    this.fillRoundRect(ctx, pad - chipPadX, pad - chipPadY, scoreW + chipPadX * 2, lineH + chipPadY * 2, radius);
-    this.fillRoundRect(ctx, this.canvas.width - pad - rightW - chipPadX, pad - chipPadY, rightW + chipPadX * 2, lineH + chipPadY * 2, radius);
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    this.fillRoundRect(ctx, pad - chipPadX, pad - chipPadY, scoreW + chipPadX * 2, chipH, radius);
+    this.fillRoundRect(ctx, this.canvas.width - pad - rightW - chipPadX, pad - chipPadY, rightW + chipPadX * 2, chipH, radius);
 
     ctx.fillStyle = '#ddc';
     ctx.textAlign = 'left';
@@ -204,7 +205,7 @@ class GameView {
     const hintPadY = Math.max(2, Math.round(hintPx * 0.22));
     const hintX = this.canvas.width / 2;
     const hintY = this.canvas.height - pad;
-    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.fillStyle = 'rgba(0,0,0,0.2)';
     this.fillRoundRect(ctx, hintX - hintW / 2 - hintPadX, hintY - hintH - hintPadY, hintW + hintPadX * 2, hintH + hintPadY * 2, Math.max(3, Math.round(hintPx * 0.3)));
     ctx.fillStyle = '#ddc';
     ctx.fillText(hint, hintX, hintY);
