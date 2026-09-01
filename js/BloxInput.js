@@ -540,15 +540,17 @@ class BloxInput {
 
   applyKeys() {
     const g = this.g;
-    if (!this.keysOn || this.pointerDown || g.ui.menuOpen() || g.waitingOnAct) return;
-    const hard = this.keys.ShiftLeft || this.keys.ShiftRight;
-    const mag = hard ? this.KEY_TILT_HARD : this.KEY_TILT;
+    if (this.pointerDown || g.ui.menuOpen() || g.waitingOnAct) return;
     let x = 0;
     let y = 0;
-    if (this.keys.ArrowLeft || this.keys.KeyA) x -= mag;
-    if (this.keys.ArrowRight || this.keys.KeyD) x += mag;
-    if (this.keys.ArrowUp || this.keys.KeyW) y -= mag;
-    if (this.keys.ArrowDown || this.keys.KeyS) y += mag;
+    if (this.keysOn) {
+      const hard = this.keys.ShiftLeft || this.keys.ShiftRight;
+      const mag = hard ? this.KEY_TILT_HARD : this.KEY_TILT;
+      if (this.keys.ArrowLeft || this.keys.KeyA) x -= mag;
+      if (this.keys.ArrowRight || this.keys.KeyD) x += mag;
+      if (this.keys.ArrowUp || this.keys.KeyW) y -= mag;
+      if (this.keys.ArrowDown || this.keys.KeyS) y += mag;
+    }
     g.downx = x;
     g.downy = y;
     g.updateMoveCnt();
@@ -620,6 +622,6 @@ class BloxInput {
       }
     }
 
-    if (this.keysOn) this.applyKeys();
+    this.applyKeys();
   }
 }
