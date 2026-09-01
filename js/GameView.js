@@ -167,12 +167,14 @@ class GameView {
     ctx.shadowBlur = 0;
     ctx.shadowOffsetX = 0;
     ctx.shadowOffsetY = 0;
+
     const fontPx = Math.max(12, Math.round(this.canvas.height * 0.035));
     const hintPx = Math.max(9, Math.round(fontPx * 0.72));
-    const pad = 10;
-    const chipPadY = Math.max(3, Math.round(fontPx * 0.18));
-    const chipPadX = pad;
+    const edge = 10;
+    const inset = Math.max(4, Math.round(fontPx * 0.28));
     const radius = Math.max(4, Math.round(fontPx * 0.28));
+    const cw = this.canvas.width;
+    const ch = this.canvas.height;
 
     ctx.font = fontPx + 'px sans-serif';
     ctx.textBaseline = 'top';
@@ -182,31 +184,29 @@ class GameView {
     const rightText = 'TILTS ' + g.curLvlData.moves + '  TIME ' + t;
     const scoreW = ctx.measureText(scoreText).width;
     const rightW = ctx.measureText(rightText).width;
-    const lineH = fontPx;
-    const chipH = lineH + chipPadY * 2 - 1;
+    const chipH = fontPx + inset * 2 - 1;
+    const textX = edge + inset;
+    const textY = edge + inset;
 
     ctx.fillStyle = 'rgba(0,0,0,0.3)';
-    this.fillRoundRect(ctx, pad - chipPadX, pad - chipPadY, scoreW + chipPadX * 2, chipH, radius);
-    this.fillRoundRect(ctx, this.canvas.width - pad - rightW - chipPadX, pad - chipPadY, rightW + chipPadX * 2, chipH, radius);
+    this.fillRoundRect(ctx, edge, edge, scoreW + inset * 2, chipH, radius);
+    this.fillRoundRect(ctx, cw - edge - rightW - inset * 2, edge, rightW + inset * 2, chipH, radius);
 
     ctx.fillStyle = '#ddc';
     ctx.textAlign = 'left';
-    ctx.fillText(scoreText, pad, pad);
+    ctx.fillText(scoreText, textX, textY);
     ctx.textAlign = 'right';
-    ctx.fillText(rightText, this.canvas.width - pad, pad);
+    ctx.fillText(rightText, cw - textX, textY);
 
     ctx.font = hintPx + 'px sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'bottom';
     const hint = 'long press for menu';
     const hintW = ctx.measureText(hint).width;
-    const hintH = hintPx;
-    const hintPadX = Math.max(5, Math.round(hintPx * 0.4));
-    const hintPadY = Math.max(2, Math.round(hintPx * 0.22));
-    const hintX = this.canvas.width / 2;
-    const hintY = this.canvas.height - pad;
+    const hintX = cw / 2;
+    const hintY = ch - edge - inset;
     ctx.fillStyle = 'rgba(0,0,0,0.2)';
-    this.fillRoundRect(ctx, hintX - hintW / 2 - hintPadX, hintY - hintH - hintPadY, hintW + hintPadX * 2, hintH + hintPadY * 2, Math.max(3, Math.round(hintPx * 0.3)));
+    this.fillRoundRect(ctx, hintX - hintW / 2 - inset, hintY - hintPx - inset, hintW + inset * 2, hintPx + inset * 2, radius);
     ctx.fillStyle = '#ddc';
     ctx.fillText(hint, hintX, hintY);
     ctx.restore();
