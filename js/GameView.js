@@ -153,15 +153,11 @@ class GameView {
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
     const pad = 10;
-    ctx.fillText('SCORE ' + g.curLvlData.score, pad, pad);
+    ctx.fillText('SCORE ' + g.ui.formatScore(g.curLvlData.score), pad, pad);
     ctx.textAlign = 'right';
     const sec = g.curLvlData.seconds;
     const t = Math.floor(sec / 60) + ':' + String(Math.floor(sec % 60)).padStart(2, '0');
-    ctx.fillText('TILTS ' + g.curLvlData.moves + '   ' + t, this.canvas.width - pad, pad);
-    ctx.textAlign = 'left';
-    ctx.font = Math.max(10, Math.round(this.canvas.height * 0.028)) + 'px sans-serif';
-    ctx.fillStyle = 'rgba(255,255,255,0.65)';
-    ctx.fillText('arrows / WASD  ·  drag to tilt  ·  A / Space bomb  ·  Esc pause', pad, this.canvas.height - pad - 16);
+    ctx.fillText('TILTS ' + g.curLvlData.moves + '  TIME ' + t, this.canvas.width - pad, pad);
     ctx.restore();
   }
 }
