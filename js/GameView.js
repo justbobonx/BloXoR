@@ -149,7 +149,14 @@ class GameView {
     ctx.save();
     ctx.globalAlpha = 1;
     ctx.fillStyle = '#fff';
-    ctx.font = Math.max(12, Math.round(this.canvas.height * 0.035)) + 'px sans-serif';
+    const fontPx = Math.max(12, Math.round(this.canvas.height * 0.035));
+    const hintPx = Math.max(9, Math.round(fontPx * 0.72));
+    const shadow = Math.max(2, Math.round(fontPx * 0.18));
+    ctx.shadowColor = '#000';
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetX = shadow;
+    ctx.shadowOffsetY = shadow;
+    ctx.font = fontPx + 'px sans-serif';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
     const pad = 10;
@@ -158,6 +165,10 @@ class GameView {
     const sec = g.curLvlData.seconds;
     const t = Math.floor(sec / 60) + ':' + String(Math.floor(sec % 60)).padStart(2, '0');
     ctx.fillText('TILTS ' + g.curLvlData.moves + '  TIME ' + t, this.canvas.width - pad, pad);
+    ctx.font = hintPx + 'px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+    ctx.fillText('long press for menu', this.canvas.width / 2, this.canvas.height - pad);
     ctx.restore();
   }
 }
