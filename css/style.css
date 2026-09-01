@@ -317,10 +317,13 @@ button.ui-focus,
 
 #ld_stats {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: max-content max-content;
   grid-template-rows: auto auto auto;
   grid-auto-flow: column;
-  gap: 4px 24px;
+  justify-content: center;
+  column-gap: 1.25rem;
+  row-gap: 4px;
+  width: 100%;
   font-size: 0.88rem;
   line-height: 1.35;
   opacity: 0.9;
