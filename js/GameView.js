@@ -178,25 +178,32 @@ class GameView {
 
     ctx.font = fontPx + 'px sans-serif';
     ctx.textBaseline = 'top';
+    ctx.textAlign = 'left';
     const scoreText = 'SCORE ' + g.ui.formatScore(g.curLvlData.score);
+    const tiltsText = 'TILTS ' + g.curLvlData.moves;
     const sec = g.curLvlData.seconds;
     const t = Math.floor(sec / 60) + ':' + String(Math.floor(sec % 60)).padStart(2, '0');
-    const rightText = 'TILTS ' + g.curLvlData.moves + '  TIME ' + t;
+    const timeText = 'TIME ' + t;
     const scoreW = ctx.measureText(scoreText).width;
-    const rightW = ctx.measureText(rightText).width;
+    const tiltsW = ctx.measureText(tiltsText).width;
+    const timeW = ctx.measureText(timeText).width;
     const chipH = fontPx + inset * 2 - 4;
-    const textX = edge + inset;
     const textY = edge + inset;
+    const scoreBoxW = scoreW + inset * 2;
+    const tiltsBoxW = tiltsW + inset * 2;
+    const timeBoxW = timeW + inset * 2;
+    const timeBoxX = cw - edge - timeBoxW;
+    const tiltsBoxX = timeBoxX - inset - tiltsBoxW;
 
     ctx.fillStyle = 'rgba(0,0,0,0.3)';
-    this.fillRoundRect(ctx, edge, edge, scoreW + inset * 2, chipH, radius);
-    this.fillRoundRect(ctx, cw - edge - rightW - inset * 2, edge, rightW + inset * 2, chipH, radius);
+    this.fillRoundRect(ctx, edge, edge, scoreBoxW, chipH, radius);
+    this.fillRoundRect(ctx, tiltsBoxX, edge, tiltsBoxW, chipH, radius);
+    this.fillRoundRect(ctx, timeBoxX, edge, timeBoxW, chipH, radius);
 
     ctx.fillStyle = '#ddc';
-    ctx.textAlign = 'left';
-    ctx.fillText(scoreText, textX, textY);
-    ctx.textAlign = 'right';
-    ctx.fillText(rightText, cw - textX, textY);
+    ctx.fillText(scoreText, edge + inset, textY);
+    ctx.fillText(tiltsText, tiltsBoxX + inset, textY);
+    ctx.fillText(timeText, timeBoxX + inset, textY);
 
     ctx.font = hintPx + 'px sans-serif';
     ctx.textAlign = 'center';
