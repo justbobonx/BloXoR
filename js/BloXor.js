@@ -366,22 +366,39 @@ class BloXor {
     this.cancelInteract();
     this.gameState = GameState.LevelBeat;
     this.soundManager.stopSound('sfx_slide');
+    const pieces = [this.bloxO1, this.bloxX, this.bloxO2].filter(Boolean);
+    let cx = this.CENTER_X;
+    let cy = this.CENTER_Y;
+    if (pieces.length) {
+      cx = 0;
+      cy = 0;
+      for (let i = 0; i < pieces.length; i++) {
+        cx += pieces[i].pos.x;
+        cy += pieces[i].pos.y;
+      }
+      cx /= pieces.length;
+      cy /= pieces.length;
+    }
+    const flyScale = 8;
     const mk = (src) => {
       const copy = new Sprite(src.bitmap, new Coord(src.pos));
-      copy.curGState.scale = src.curGState.scale || 1;
+      const startScale = src.curGState.scale || 1;
+      copy.curGState.scale = startScale;
       copy.setAnimateDuration(900);
       const animateTo = new GfxState();
-      animateTo.scale = 8;
+      animateTo.scale = flyScale;
       animateTo.alpha = 0;
       copy.setAnimateGfxTo(animateTo);
+      copy.setAnimatePosTo(new Coord(
+        this.CENTER_X + (src.pos.x - cx) * (flyScale / startScale),
+        this.CENTER_Y + (src.pos.y - cy) * (flyScale / startScale)
+      ));
       copy.setAnimateCurve(Sprite.AnimateCurveType.EASE_IN);
       copy.setRemoveWhenDoneAnimating(true);
       copy.startAnimation();
       this.effects.push(copy);
     };
-    if (this.bloxO1) mk(this.bloxO1);
-    if (this.bloxX) mk(this.bloxX);
-    if (this.bloxO2) mk(this.bloxO2);
+    for (let i = 0; i < pieces.length; i++) mk(pieces[i]);
     this.soundManager.playSound('sfx_win');
     const curLd = this.levelData[this.curPuzzleInd];
     const prevBeaten = curLd.beaten;
