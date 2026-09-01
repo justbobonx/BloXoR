@@ -521,6 +521,10 @@ class BloXorUI {
     document.getElementById('ps_menu').addEventListener('click', () => {
       g.enterPlayChrome().then(() => this.showLevelSelect());
     });
+    document.getElementById('ps_mute').addEventListener('click', () => {
+      g.setSoundMute(!g.soundManager.muted());
+      g.save.saveUserData();
+    });
     document.getElementById('ld_back').addEventListener('click', () => this.closeDetail());
     document.getElementById('ld_play').addEventListener('click', () => {
       g.enterPlayChrome().then(() => g.playLevel(g.curPuzzleInd));
@@ -529,10 +533,7 @@ class BloXorUI {
       this.closeScore();
       g.enterPlayChrome().then(() => this.showLevelSelect());
     });
-    document.getElementById('sb_mute').addEventListener('click', () => {
-      g.setSoundMute(!g.soundManager.muted());
-      g.save.saveUserData();
-    });
+    this.syncMute();
   }
 
   menuOpen() {
@@ -573,13 +574,11 @@ class BloXorUI {
     if (layer === 'start') ids = ['newGameButton', 'continueButton'];
     else if (layer === 'select') {
       this.focusEls = Array.prototype.slice.call(document.querySelectorAll('#ls_list .ls-row'));
-      const mute = document.getElementById('sb_mute');
-      if (mute) this.focusEls.push(mute);
       this.clampFocus();
       this.paintFocus(false);
       return;
     } else if (layer === 'detail') ids = ['ld_back', 'ld_play'];
-    else if (layer === 'pause') ids = ['ps_resume', 'ps_restart', 'ps_menu'];
+    else if (layer === 'pause') ids = ['ps_resume', 'ps_restart', 'ps_menu', 'ps_mute'];
     else if (layer === 'score') ids = ['sc_ok'];
     this.focusEls = ids.map((id) => document.getElementById(id)).filter((el) => el && !el.classList.contains('hidden') && !el.disabled);
     this.clampFocus();
@@ -671,15 +670,17 @@ class BloXorUI {
     g.cancelInteract();
     g.gameState = GameState.NoDraw;
     this.hideMenus();
-    document.getElementById('ls_tot').textContent = String(g.totScore);
-    document.getElementById('ls_beat').textContent = 'Lvls Comp: ' + g.lvlsBeat;
-    document.getElementById('ls_open').textContent = 'Lvls Open: ' + g.lvlsOpen;
     const tot = g.totTime;
-    document.getElementById('ls_time').textContent =
-      'Tot Time: ' + Math.floor(tot / 3600) + ':' +
+    const timeStr =
+      Math.floor(tot / 3600) + ':' +
       String(Math.floor((tot / 60) % 60)).padStart(2, '0') + ':' +
       String(Math.floor(tot % 60 + 0.5)).padStart(2, '0');
-    document.getElementById('ls_plays').textContent = 'Tot Plays: ' + g.totGamesPlayed;
+    document.getElementById('ls_stats').textContent =
+      'SCORE: ' + g.totScore +
+      ' · Lvls Open: ' + g.lvlsOpen +
+      ' · Lvls Comp: ' + g.lvlsBeat +
+      ' · Tot Time: ' + timeStr +
+      ' · Tot Plays: ' + g.totGamesPlayed;
 
     const list = document.getElementById('ls_list');
     list.innerHTML = '';
@@ -768,6 +769,7 @@ class BloXorUI {
     this.g.silenceAudio();
     this.g.cancelInteract();
     this.hideMenus();
+    this.syncMute();
     document.getElementById('pauseScreen').classList.remove('hidden');
     this.focusIndex = 0;
     this.collectFocus();
@@ -793,7 +795,8 @@ class BloXorUI {
   refreshPlayHud() {}
 
   syncMute() {
-    const btn = document.getElementById('sb_mute');
+    const btn = document.getElementById('ps_mute');
+    if (!btn) return;
     btn.textContent = this.g.soundManager.muted() ? 'sound off' : 'sound on';
   }
 }
