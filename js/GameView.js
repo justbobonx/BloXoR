@@ -193,7 +193,7 @@ class GameView {
     const tiltsBoxW = tiltsW + inset * 2;
     const timeBoxW = timeW + inset * 2;
     const timeBoxX = cw - edge - timeBoxW;
-    const tiltsBoxX = timeBoxX - inset - tiltsBoxW;
+    const tiltsBoxX = timeBoxX - inset*2 - tiltsBoxW;
 
     ctx.fillStyle = 'rgba(0,0,0,0.3)';
     this.fillRoundRect(ctx, edge, edge, scoreBoxW, chipH, radius);
