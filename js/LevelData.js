@@ -41,6 +41,12 @@ class LevelData {
     return d.toLocaleString();
   }
 
+  formattedDate(t) {
+    if (!t) return '';
+    const d = new Date(t);
+    return d.toLocaleDateString();
+  }
+
   getDataString() {
     return [
       this.opened,
