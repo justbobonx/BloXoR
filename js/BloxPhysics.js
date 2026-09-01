@@ -344,7 +344,9 @@ class BloxPhysics {
     const dify = Math.abs(hitBlox.pos.y - aBlox.pos.y);
     const difx = Math.abs(potNewX - hitBlox.pos.x);
 
-    if (dify >= (g.bloxDistMin1 - 1.96) || difx >= g.bloxDistMin1) return false;
+    // Inclusive rest: glue snaps to exactly bloxDistMin1, so >= dropped the wall the next frame
+    // and a slightly-too-close mover pulled the middle blox back off the pin.
+    if (dify >= (g.bloxDistMin1 - 1.96) || difx > g.bloxDistMin1) return false;
 
     if (hitBlox.bloxType === BloxType.OW_L) {
       if (hitBlox.pos.x > potNewX && hitBlox.pos.x - aBlox.pos.x >= g.bloxDistMin1) return true;
@@ -369,7 +371,7 @@ class BloxPhysics {
     const difx = Math.abs(hitBlox.pos.x - aBlox.pos.x);
     const dify = Math.abs(potNewY - hitBlox.pos.y);
 
-    if (difx >= (g.bloxDistMin1 - 1.96) || dify >= g.bloxDistMin1) return false;
+    if (difx >= (g.bloxDistMin1 - 1.96) || dify > g.bloxDistMin1) return false;
 
     if (hitBlox.bloxType === BloxType.OW_U) {
       if (hitBlox.pos.y > potNewY && hitBlox.pos.y - aBlox.pos.y >= g.bloxDistMin1) return true;
