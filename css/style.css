@@ -155,13 +155,40 @@ button.ui-focus,
 }
 
 #ld_name,
-#ps_title {
+#ps_title,
+#sc_title {
   text-align: center;
 }
 
-#ps_title {
+#ps_title,
+#sc_title {
   font-size: 1rem;
   margin-bottom: 8px;
+}
+
+#scoreView .sc-stats {
+  margin-top: 2px;
+  gap: 6px;
+  align-items: center;
+}
+
+.sc-stat {
+  font-size: 0.95rem;
+  text-align: center;
+  width: 100%;
+}
+
+.sc-stat.best {
+  color: #f5d76e;
+}
+
+.sc-old {
+  color: #8a8a8a;
+  font-size: 0.82em;
+}
+
+#scoreView .row {
+  margin-top: 10px;
 }
 
 #pauseScreen .col {

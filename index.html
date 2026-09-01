@@ -29,7 +29,7 @@
     #orientGate.hidden { display: none !important; }
   </style>
   <script>
-    window.VERSION = '0.3.24';
+    window.VERSION = '0.3.25';
     document.write('<link rel="stylesheet" href="css/style.css?v=' + window.VERSION + '">');
     if (window.innerHeight > window.innerWidth) {
       document.documentElement.classList.add('stage-swap');
@@ -104,12 +104,16 @@
       </div>
     </div>
 
-    <div id="scoreView" class="panel hidden">
-      <div class="panel-title">Level done</div>
-      <div id="sc_score"></div>
-      <div id="sc_time"></div>
-      <div id="sc_moves"></div>
-      <button type="button" id="sc_ok">OK</button>
+    <div id="scoreView" class="panel compact hidden">
+      <div id="sc_title" class="panel-title"></div>
+      <div class="col sc-stats">
+        <div id="sc_score" class="sc-stat"></div>
+        <div id="sc_time" class="sc-stat"></div>
+        <div id="sc_moves" class="sc-stat"></div>
+      </div>
+      <div class="row row-center">
+        <button type="button" id="sc_ok">OK</button>
+      </div>
     </div>
   </div>
 

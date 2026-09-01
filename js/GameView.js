@@ -141,7 +141,7 @@ class GameView {
 
   drawHud(ctx) {
     const g = this.g;
-    if (g.gameState !== GameState.InPlay && g.gameState !== GameState.WaitToStartNewLevel) return;
+    if (g.gameState !== GameState.InPlay && g.gameState !== GameState.WaitToStartNewLevel && g.gameState !== GameState.LevelBeat) return;
     ctx.save();
     ctx.globalAlpha = 1;
     ctx.fillStyle = '#fff';
