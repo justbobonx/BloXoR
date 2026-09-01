@@ -170,8 +170,8 @@ class GameView {
 
     const fontPx = Math.max(12, Math.round(this.canvas.height * 0.035));
     const hintPx = Math.max(9, Math.round(fontPx * 0.72));
-    const edge = 10;
-    const inset = Math.max(4, Math.round(fontPx * 0.28));
+    const edge = 5;
+    const inset = Math.max(3, Math.round(fontPx * 0.20));
     const radius = Math.max(4, Math.round(fontPx * 0.28));
     const cw = this.canvas.width;
     const ch = this.canvas.height;
@@ -184,7 +184,7 @@ class GameView {
     const rightText = 'TILTS ' + g.curLvlData.moves + '  TIME ' + t;
     const scoreW = ctx.measureText(scoreText).width;
     const rightW = ctx.measureText(rightText).width;
-    const chipH = fontPx + inset * 2 - 1;
+    const chipH = fontPx + inset * 2 - 4;
     const textX = edge + inset;
     const textY = edge + inset;
 
@@ -206,7 +206,7 @@ class GameView {
     const hintX = cw / 2;
     const hintY = ch - edge - inset;
     ctx.fillStyle = 'rgba(0,0,0,0.2)';
-    this.fillRoundRect(ctx, hintX - hintW / 2 - inset, hintY - hintPx - inset, hintW + inset * 2, hintPx + inset * 2, radius);
+    this.fillRoundRect(ctx, hintX - hintW / 2 - inset, hintY - hintPx - inset + 2, hintW + inset * 2, hintPx + inset * 1.5, radius);
     ctx.fillStyle = '#ddc';
     ctx.fillText(hint, hintX, hintY);
     ctx.restore();
