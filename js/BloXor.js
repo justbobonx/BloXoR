@@ -328,7 +328,7 @@ class BloXor {
     this.curPuzzleInd = i;
     this.loader.setupPuzzleI(i);
     this.ui.hideMenus();
-    this.gameState = GameState.WaitToStartNewLevel;
+    this.gameState = this.input.usingTiltControl() ? GameState.WaitToStartNewLevel : GameState.InPlay;
     this.input.absorbButtons();
     this.view.draw();
   }
