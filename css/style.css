@@ -101,7 +101,7 @@ html.stage-swap #game-container {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  width: min(80%, 280px);
+  width: min(40%, 140px);
 }
 
 #startButtons button,
@@ -289,7 +289,8 @@ button.ui-focus,
   margin-top: 12px;
 }
 
-.col { flex-direction: column; }
+.col { flex-direction: column;
+}
 
 .row-center {
   justify-content: center;
