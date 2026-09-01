@@ -143,32 +143,71 @@ class GameView {
     this.drawHud(ctx);
   }
 
+  fillRoundRect(ctx, x, y, w, h, r) {
+    const rr = Math.max(0, Math.min(r, w / 2, h / 2));
+    ctx.beginPath();
+    if (ctx.roundRect) {
+      ctx.roundRect(x, y, w, h, rr);
+    } else {
+      ctx.moveTo(x + rr, y);
+      ctx.arcTo(x + w, y, x + w, y + h, rr);
+      ctx.arcTo(x + w, y + h, x, y + h, rr);
+      ctx.arcTo(x, y + h, x, y, rr);
+      ctx.arcTo(x, y, x + w, y, rr);
+      ctx.closePath();
+    }
+    ctx.fill();
+  }
+
   drawHud(ctx) {
     const g = this.g;
     if (g.gameState !== GameState.InPlay && g.gameState !== GameState.WaitToStartNewLevel && g.gameState !== GameState.LevelBeat) return;
     ctx.save();
-    ctx.globalAlpha = 1;
-    ctx.fillStyle = '#ddc';
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
     const fontPx = Math.max(12, Math.round(this.canvas.height * 0.035));
     const hintPx = Math.max(9, Math.round(fontPx * 0.72));
-    const shadow = Math.max(1, Math.round(fontPx * 0.08));
-    ctx.shadowColor = '#000';
-    ctx.shadowBlur = shadow/1.5;
-    ctx.shadowOffsetX = shadow;
-    ctx.shadowOffsetY = shadow;
-    ctx.font = fontPx + 'px sans-serif';
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'top';
     const pad = 10;
-    ctx.fillText('SCORE ' + g.ui.formatScore(g.curLvlData.score), pad, pad);
-    ctx.textAlign = 'right';
+    const chipPadX = Math.max(6, Math.round(fontPx * 0.35));
+    const chipPadY = Math.max(3, Math.round(fontPx * 0.18));
+    const radius = Math.max(4, Math.round(fontPx * 0.28));
+
+    ctx.font = fontPx + 'px sans-serif';
+    ctx.textBaseline = 'top';
+    const scoreText = 'SCORE ' + g.ui.formatScore(g.curLvlData.score);
     const sec = g.curLvlData.seconds;
     const t = Math.floor(sec / 60) + ':' + String(Math.floor(sec % 60)).padStart(2, '0');
-    ctx.fillText('TILTS ' + g.curLvlData.moves + '  TIME ' + t, this.canvas.width - pad, pad);
+    const rightText = 'TILTS ' + g.curLvlData.moves + '  TIME ' + t;
+    const scoreW = ctx.measureText(scoreText).width;
+    const rightW = ctx.measureText(rightText).width;
+    const lineH = fontPx;
+
+    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+    this.fillRoundRect(ctx, pad - chipPadX, pad - chipPadY, scoreW + chipPadX * 2, lineH + chipPadY * 2, radius);
+    this.fillRoundRect(ctx, this.canvas.width - pad - rightW - chipPadX, pad - chipPadY, rightW + chipPadX * 2, lineH + chipPadY * 2, radius);
+
+    ctx.fillStyle = '#ddc';
+    ctx.textAlign = 'left';
+    ctx.fillText(scoreText, pad, pad);
+    ctx.textAlign = 'right';
+    ctx.fillText(rightText, this.canvas.width - pad, pad);
+
     ctx.font = hintPx + 'px sans-serif';
     ctx.textAlign = 'center';
-    ctx.textBaseline = 'bottom';    
-    ctx.fillText('long press for menu', this.canvas.width / 2, this.canvas.height - pad);
+    ctx.textBaseline = 'bottom';
+    const hint = 'long press for menu';
+    const hintW = ctx.measureText(hint).width;
+    const hintH = hintPx;
+    const hintPadX = Math.max(5, Math.round(hintPx * 0.4));
+    const hintPadY = Math.max(2, Math.round(hintPx * 0.22));
+    const hintX = this.canvas.width / 2;
+    const hintY = this.canvas.height - pad;
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    this.fillRoundRect(ctx, hintX - hintW / 2 - hintPadX, hintY - hintH - hintPadY, hintW + hintPadX * 2, hintH + hintPadY * 2, Math.max(3, Math.round(hintPx * 0.3)));
+    ctx.fillStyle = '#ddc';
+    ctx.fillText(hint, hintX, hintY);
     ctx.restore();
   }
 }
