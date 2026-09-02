@@ -22,14 +22,9 @@ class GameView {
     g.HEIGHT = 320;
     g.CENTER_X = 240;
     g.CENTER_Y = 160;
-    g.bloxDist = 40;
-    g.bloxDistDiv2 = 20;
-    g.bloxDistMin1 = 40;
-    g.BLOX_SPEED = 22;
-    g.HOLE_FALLIN_DIST = 40 * 0.57;
-    g.theScale = 1;
     g.TOUCH_LEFT = 0;
     g.TOUCH_TOP = 0;
+    g.theScale = 1;
 
     const board = BitmapManager.getInstance().get('whole_bg_ls');
     const boardW = board ? board.width : 480;

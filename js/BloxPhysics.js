@@ -202,18 +202,19 @@ class BloxPhysics {
 
   _bumpXAt(ax, ay, hit, hx, hy, fromX, fromY) {
     const g = this.g;
+    const dist = g.bloxDist;
     const dify = Math.abs(hy - ay);
     const difx = Math.abs(ax - hx);
-    if (dify >= (g.bloxDistMin1 - this.CORNER_ROUND) || difx >= g.bloxDistMin1) return false;
+    if (dify >= (dist - this.CORNER_ROUND) || difx >= dist) return false;
 
     if (hit.bloxType === BloxType.OW_L) {
-      if (hx > ax && hx - fromX >= g.bloxDistMin1) return true;
+      if (hx > ax && hx - fromX >= dist) return true;
     } else if (hit.bloxType === BloxType.OW_R) {
-      if (ax > hx && fromX - hx >= g.bloxDistMin1) return true;
+      if (ax > hx && fromX - hx >= dist) return true;
     } else if (hit.bloxType === BloxType.OW_U) {
-      if (fromY < hy && Math.abs(fromX - hx) >= g.bloxDistMin1) return true;
+      if (fromY < hy && Math.abs(fromX - hx) >= dist) return true;
     } else if (hit.bloxType === BloxType.OW_D) {
-      if (fromY > hy && Math.abs(fromX - hx) >= g.bloxDistMin1) return true;
+      if (fromY > hy && Math.abs(fromX - hx) >= dist) return true;
     } else {
       return true;
     }
@@ -222,18 +223,19 @@ class BloxPhysics {
 
   _bumpYAt(ax, ay, hit, hx, hy, fromX, fromY) {
     const g = this.g;
+    const dist = g.bloxDist;
     const difx = Math.abs(hx - ax);
     const dify = Math.abs(ay - hy);
-    if (difx >= (g.bloxDistMin1 - this.CORNER_ROUND) || dify >= g.bloxDistMin1) return false;
+    if (difx >= (dist - this.CORNER_ROUND) || dify >= dist) return false;
 
     if (hit.bloxType === BloxType.OW_U) {
-      if (hy > ay && hy - fromY >= g.bloxDistMin1) return true;
+      if (hy > ay && hy - fromY >= dist) return true;
     } else if (hit.bloxType === BloxType.OW_D) {
-      if (ay > hy && fromY - hy >= g.bloxDistMin1) return true;
+      if (ay > hy && fromY - hy >= dist) return true;
     } else if (hit.bloxType === BloxType.OW_L) {
-      if (fromX < hx && Math.abs(fromY - hy) >= g.bloxDistMin1) return true;
+      if (fromX < hx && Math.abs(fromY - hy) >= dist) return true;
     } else if (hit.bloxType === BloxType.OW_R) {
-      if (fromX > hx && Math.abs(fromY - hy) >= g.bloxDistMin1) return true;
+      if (fromX > hx && Math.abs(fromY - hy) >= dist) return true;
     } else {
       return true;
     }
@@ -242,6 +244,7 @@ class BloxPhysics {
 
   _planPushX(blox, targetX, visiting, plan) {
     const g = this.g;
+    const dist = g.bloxDist;
     targetX = this._q(targetX);
     if (visiting.has(blox)) return true;
     visiting.add(blox);
@@ -258,7 +261,7 @@ class BloxPhysics {
       const hitX = plan.has(hit) ? plan.get(hit) : hit.pos.x;
       if (!this._bumpXAt(targetX, blox.pos.y, hit, hitX, hit.pos.y, blox.pos.x, blox.pos.y)) return true;
       if (!hit.mover) return false;
-      const hitTarget = targetX <= hitX ? targetX + g.bloxDistMin1 : targetX - g.bloxDistMin1;
+      const hitTarget = targetX <= hitX ? targetX + dist : targetX - dist;
       return this._planPushX(hit, hitTarget, visiting, plan);
     };
 
@@ -275,6 +278,7 @@ class BloxPhysics {
 
   _planPushY(blox, targetY, visiting, plan) {
     const g = this.g;
+    const dist = g.bloxDist;
     targetY = this._q(targetY);
     if (visiting.has(blox)) return true;
     visiting.add(blox);
@@ -291,7 +295,7 @@ class BloxPhysics {
       const hitY = plan.has(hit) ? plan.get(hit) : hit.pos.y;
       if (!this._bumpYAt(blox.pos.x, targetY, hit, hit.pos.x, hitY, blox.pos.x, blox.pos.y)) return true;
       if (!hit.mover) return false;
-      const hitTarget = targetY <= hitY ? targetY + g.bloxDistMin1 : targetY - g.bloxDistMin1;
+      const hitTarget = targetY <= hitY ? targetY + dist : targetY - dist;
       return this._planPushY(hit, hitTarget, visiting, plan);
     };
 
@@ -325,8 +329,8 @@ class BloxPhysics {
   }
 
   _tryPushMoverX(hit, keepX) {
-    const g = this.g;
-    const hitTarget = this._q(keepX <= hit.pos.x ? keepX + g.bloxDistMin1 : keepX - g.bloxDistMin1);
+    const dist = this.g.bloxDist;
+    const hitTarget = this._q(keepX <= hit.pos.x ? keepX + dist : keepX - dist);
     const plan = new Map();
     this._cornering = true;
     const ok = this._planPushX(hit, hitTarget, new Set(), plan);
@@ -337,8 +341,8 @@ class BloxPhysics {
   }
 
   _tryPushMoverY(hit, keepY) {
-    const g = this.g;
-    const hitTarget = this._q(keepY <= hit.pos.y ? keepY + g.bloxDistMin1 : keepY - g.bloxDistMin1);
+    const dist = this.g.bloxDist;
+    const hitTarget = this._q(keepY <= hit.pos.y ? keepY + dist : keepY - dist);
     const plan = new Map();
     this._cornering = true;
     const ok = this._planPushY(hit, hitTarget, new Set(), plan);
@@ -349,9 +353,8 @@ class BloxPhysics {
   }
 
   _staticHitX(blox, x) {
-    const g = this.g;
     const list = [];
-    g.field.giveMeListOfBloxInTheFieldPointsFor(x, blox.pos.y, list);
+    this.g.field.giveMeListOfBloxInTheFieldPointsFor(x, blox.pos.y, list);
     for (let i = 0; i < list.length; i++) {
       const hit = list[i];
       if (!hit || hit === blox || hit.mover) continue;
@@ -361,9 +364,8 @@ class BloxPhysics {
   }
 
   _staticHitY(blox, y) {
-    const g = this.g;
     const list = [];
-    g.field.giveMeListOfBloxInTheFieldPointsFor(blox.pos.x, y, list);
+    this.g.field.giveMeListOfBloxInTheFieldPointsFor(blox.pos.x, y, list);
     for (let i = 0; i < list.length; i++) {
       const hit = list[i];
       if (!hit || hit === blox || hit.mover) continue;
@@ -375,7 +377,7 @@ class BloxPhysics {
   _finishCorner(aBlox, oldX, oldY) {
     if (this._cornering) return;
     const g = this.g;
-    const dist = g.bloxDistMin1;
+    const dist = g.bloxDist;
     const slip = dist - this.CORNER_ROUND;
 
     const hits = [];
@@ -417,6 +419,7 @@ class BloxPhysics {
 
   updateTheBlox(aBlox) {
     const g = this.g;
+    const dist = g.bloxDist;
     aBlox.updateCount = g.updateCounter;
     if (!aBlox.mover) return;
 
@@ -429,8 +432,8 @@ class BloxPhysics {
     aBlox.vel.x += g.modDownx;
     aBlox.vel.y += g.modDowny;
 
-    if (Math.abs(aBlox.vel.x) > g.bloxDist) aBlox.vel.x = g.bloxDistMin1 * Math.sign(aBlox.vel.x);
-    if (Math.abs(aBlox.vel.y) > g.bloxDist) aBlox.vel.y = g.bloxDistMin1 * Math.sign(aBlox.vel.y);
+    if (Math.abs(aBlox.vel.x) > dist) aBlox.vel.x = dist * Math.sign(aBlox.vel.x);
+    if (Math.abs(aBlox.vel.y) > dist) aBlox.vel.y = dist * Math.sign(aBlox.vel.y);
 
     let potNewX = this._q(aBlox.pos.x + aBlox.vel.x);
     let potNewY = this._q(aBlox.pos.y + aBlox.vel.y);
@@ -455,7 +458,7 @@ class BloxPhysics {
             }
             if (this.checkBumpX(aBlox, hitBlox, potNewX)) {
               if (hitBlox.mover && this._tryPushMoverX(hitBlox, potNewX)) continue;
-              const snap = aBlox.pos.x <= hitBlox.pos.x ? hitBlox.pos.x - g.bloxDistMin1 : hitBlox.pos.x + g.bloxDistMin1;
+              const snap = aBlox.pos.x <= hitBlox.pos.x ? hitBlox.pos.x - dist : hitBlox.pos.x + dist;
               if (hitBlox.mover && this._staticHitX(aBlox, snap)) {
                 potNewX = aBlox.pos.x;
                 aBlox.vel.x = 0;
@@ -490,7 +493,7 @@ class BloxPhysics {
             }
             if (this.checkBumpY(aBlox, hitBlox, potNewY)) {
               if (hitBlox.mover && this._tryPushMoverY(hitBlox, potNewY)) continue;
-              const snap = aBlox.pos.y <= hitBlox.pos.y ? hitBlox.pos.y - g.bloxDistMin1 : hitBlox.pos.y + g.bloxDistMin1;
+              const snap = aBlox.pos.y <= hitBlox.pos.y ? hitBlox.pos.y - dist : hitBlox.pos.y + dist;
               if (hitBlox.mover && this._staticHitY(aBlox, snap)) {
                 potNewY = aBlox.pos.y;
                 aBlox.vel.y = 0;

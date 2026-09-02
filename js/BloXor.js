@@ -20,9 +20,8 @@ class BloXor {
     this.MINUS_PER_TIC = 2.5;
     this.SCORE_RATIO_MOD = 0.5;
     this.bloxDist = 40.0;
-    this.bloxDistDiv2 = 20.0;
-    this.bloxDistMin1 = 40.0;
-    this.HOLE_FALLIN_DIST = 40.0 * 0.57;
+    this.bloxDistDiv2 = this.bloxDist / 2;
+    this.HOLE_FALLIN_DIST = this.bloxDist * 0.57;
     this.BLOX_SPEED = 22;
     this.BLOX_FRICTION_MIN = 0.1;
     this.BLOX_FRICTION_RANGE = 0.85;
