@@ -4,6 +4,7 @@ class BloxPhysics {
     this.rand = Math.random;
     this.boomi = 0;
     this._cornering = false;
+    this.CORNER_ROUND = 1.96;
   }
 
   updateBlox() {
@@ -203,7 +204,7 @@ class BloxPhysics {
     const g = this.g;
     const dify = Math.abs(hy - ay);
     const difx = Math.abs(ax - hx);
-    if (dify >= (g.bloxDistMin1 - 1.96) || difx >= g.bloxDistMin1) return false;
+    if (dify >= (g.bloxDistMin1 - this.CORNER_ROUND) || difx >= g.bloxDistMin1) return false;
 
     if (hit.bloxType === BloxType.OW_L) {
       if (hx > ax && hx - fromX >= g.bloxDistMin1) return true;
@@ -223,7 +224,7 @@ class BloxPhysics {
     const g = this.g;
     const difx = Math.abs(hx - ax);
     const dify = Math.abs(ay - hy);
-    if (difx >= (g.bloxDistMin1 - 1.96) || dify >= g.bloxDistMin1) return false;
+    if (difx >= (g.bloxDistMin1 - this.CORNER_ROUND) || dify >= g.bloxDistMin1) return false;
 
     if (hit.bloxType === BloxType.OW_U) {
       if (hy > ay && hy - fromY >= g.bloxDistMin1) return true;
@@ -308,7 +309,7 @@ class BloxPhysics {
   _finishCorner(aBlox, oldX, oldY) {
     if (this._cornering) return;
     const g = this.g;
-    const slip = g.bloxDistMin1 - 1.96;
+    const slip = g.bloxDistMin1 - this.CORNER_ROUND;
 
     const hits = [];
     g.field.giveMeListOfBloxInTheFieldPointsFor(aBlox.pos.x, aBlox.pos.y, hits);
