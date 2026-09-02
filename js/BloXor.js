@@ -364,6 +364,7 @@ class BloXor {
   }
   levelCompeted() {
     this.cancelInteract();
+    this.input.startWakeGrace();
     this.gameState = GameState.LevelBeat;
     this.soundManager.stopSound('sfx_slide');
     const pieces = [this.bloxO1, this.bloxX, this.bloxO2].filter(Boolean);
@@ -649,7 +650,10 @@ class BloXorUI {
     document.getElementById('scoreView').classList.remove('hidden');
     this.focusIndex = 0; this.collectFocus(); this.g.input.absorbButtons();
   }
-  closeScore() { document.getElementById('scoreView').classList.add('hidden'); }
+  closeScore() {
+    document.getElementById('scoreView').classList.add('hidden');
+    this.g.input.clearWakeGrace();
+  }
   refreshPlayHud() {}
   syncMute() {
     const btn = document.getElementById('ps_mute');
