@@ -199,40 +199,40 @@ class BloxPhysics {
     return t === BloxType.OW_L || t === BloxType.OW_R || t === BloxType.OW_U || t === BloxType.OW_D;
   }
 
-  _bumpXAt(ax, ay, hit, hx, hy) {
+  _bumpXAt(ax, ay, hit, hx, hy, fromX, fromY) {
     const g = this.g;
     const dify = Math.abs(hy - ay);
     const difx = Math.abs(ax - hx);
     if (dify >= (g.bloxDistMin1 - 1.96) || difx >= g.bloxDistMin1) return false;
 
     if (hit.bloxType === BloxType.OW_L) {
-      if (hx > ax && hx - ax >= g.bloxDistMin1) return true;
+      if (hx > ax && hx - fromX >= g.bloxDistMin1) return true;
     } else if (hit.bloxType === BloxType.OW_R) {
-      if (ax > hx && ax - hx >= g.bloxDistMin1) return true;
+      if (ax > hx && fromX - hx >= g.bloxDistMin1) return true;
     } else if (hit.bloxType === BloxType.OW_U) {
-      if (ay < hy && Math.abs(ax - hx) >= g.bloxDistMin1) return true;
+      if (fromY < hy && Math.abs(fromX - hx) >= g.bloxDistMin1) return true;
     } else if (hit.bloxType === BloxType.OW_D) {
-      if (ay > hy && Math.abs(ax - hx) >= g.bloxDistMin1) return true;
+      if (fromY > hy && Math.abs(fromX - hx) >= g.bloxDistMin1) return true;
     } else {
       return true;
     }
     return false;
   }
 
-  _bumpYAt(ax, ay, hit, hx, hy) {
+  _bumpYAt(ax, ay, hit, hx, hy, fromX, fromY) {
     const g = this.g;
     const difx = Math.abs(hx - ax);
     const dify = Math.abs(ay - hy);
     if (difx >= (g.bloxDistMin1 - 1.96) || dify >= g.bloxDistMin1) return false;
 
     if (hit.bloxType === BloxType.OW_U) {
-      if (hy > ay && hy - ay >= g.bloxDistMin1) return true;
+      if (hy > ay && hy - fromY >= g.bloxDistMin1) return true;
     } else if (hit.bloxType === BloxType.OW_D) {
-      if (ay > hy && ay - hy >= g.bloxDistMin1) return true;
+      if (ay > hy && fromY - hy >= g.bloxDistMin1) return true;
     } else if (hit.bloxType === BloxType.OW_L) {
-      if (ax < hx && Math.abs(ay - hy) >= g.bloxDistMin1) return true;
+      if (fromX < hx && Math.abs(fromY - hy) >= g.bloxDistMin1) return true;
     } else if (hit.bloxType === BloxType.OW_R) {
-      if (ax > hx && Math.abs(ay - hy) >= g.bloxDistMin1) return true;
+      if (fromX > hx && Math.abs(fromY - hy) >= g.bloxDistMin1) return true;
     } else {
       return true;
     }
@@ -255,7 +255,7 @@ class BloxPhysics {
     const consider = (hit) => {
       if (!hit || hit === blox) return true;
       const hitX = plan.has(hit) ? plan.get(hit) : hit.pos.x;
-      if (!this._bumpXAt(targetX, blox.pos.y, hit, hitX, hit.pos.y)) return true;
+      if (!this._bumpXAt(targetX, blox.pos.y, hit, hitX, hit.pos.y, blox.pos.x, blox.pos.y)) return true;
       if (!hit.mover) return false;
       const hitTarget = targetX <= hitX ? targetX + g.bloxDistMin1 : targetX - g.bloxDistMin1;
       return this._planPushX(hit, hitTarget, visiting, plan);
@@ -288,7 +288,7 @@ class BloxPhysics {
     const consider = (hit) => {
       if (!hit || hit === blox) return true;
       const hitY = plan.has(hit) ? plan.get(hit) : hit.pos.y;
-      if (!this._bumpYAt(blox.pos.x, targetY, hit, hit.pos.x, hitY)) return true;
+      if (!this._bumpYAt(blox.pos.x, targetY, hit, hit.pos.x, hitY, blox.pos.x, blox.pos.y)) return true;
       if (!hit.mover) return false;
       const hitTarget = targetY <= hitY ? targetY + g.bloxDistMin1 : targetY - g.bloxDistMin1;
       return this._planPushY(hit, hitTarget, visiting, plan);
@@ -484,11 +484,11 @@ class BloxPhysics {
   }
 
   checkBumpX(aBlox, hitBlox, potNewX) {
-    return this._bumpXAt(potNewX, aBlox.pos.y, hitBlox, hitBlox.pos.x, hitBlox.pos.y);
+    return this._bumpXAt(potNewX, aBlox.pos.y, hitBlox, hitBlox.pos.x, hitBlox.pos.y, aBlox.pos.x, aBlox.pos.y);
   }
 
   checkBumpY(aBlox, hitBlox, potNewY) {
-    return this._bumpYAt(aBlox.pos.x, potNewY, hitBlox, hitBlox.pos.x, hitBlox.pos.y);
+    return this._bumpYAt(aBlox.pos.x, potNewY, hitBlox, hitBlox.pos.x, hitBlox.pos.y, aBlox.pos.x, aBlox.pos.y);
   }
 
   blowUpBlox(b) {
