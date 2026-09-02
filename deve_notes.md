@@ -14,6 +14,8 @@ window.VERSION = '0.3.12';
 
 CSS and every script are injected as `file?v=` + that string. Change **only** that line after an update. Do not sprinkle versions on individual tags. `index.html` itself relies on the no-cache meta; if Pages serves a stale index, the new VERSION never runs.
 
+Bump VERSION **last**, only after the JS/CSS blobs from that same change are on `main` and checked. A version bump against a truncated file forces every client onto the broken blob.
+
 ## What works now
 
 - Full puzzle set, thumbs, lock/open rules (`NUM_LEVELS_ALLOW_OPEN`).
@@ -64,3 +66,17 @@ Save key: `localStorage['BloXoRSaveData']`.
 - `updateMoveCnt` still reads `g.FLAT_SPAN`. Deadzone constants now live on `BloxInput`. If move-count deadzone looks wrong, point it at `this.input.FLAT_SPAN` or restore `g.FLAT_*`.
 - GameMaker reference for stick + bomb selector: owner’s Steam GML (`updateMove`, `Step_0`, `interactControl`). Match that feel, don’t invent a new scheme.
 - Do not reintroduce `screen.orientation.lock` or a “turn your phone” banner. Users see the landscape stage and turn the handset.
+
+## GitHub writes from chat
+
+Remote edits replace the **whole file**. A 20-line fix still uploads the entire source. Do not send a fragment, stub, or placeholder — GitHub will take it and `main` will serve it.
+
+Do not split `BloxInput.js` / `BloXor.js` just to make uploads smaller. Those sizes are fine.
+
+After every remote write, before the next file or a VERSION bump:
+
+- Blob size is in the same ballpark as the file you meant (not tens of bytes).
+- File still starts with the real class / header.
+- Unique strings from the intended edit are present (`playingForWake`, the new symbol, etc.).
+
+Prefer one commit that contains every file in the change. Verify, then bump VERSION last.
