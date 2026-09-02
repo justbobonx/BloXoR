@@ -172,6 +172,147 @@ class BloxPhysics {
     }
   }
 
+  _q(v) {
+    return Math.trunc(v * this.g.BLOX_POS_PRECISION) / this.g.BLOX_POS_PRECISION;
+  }
+
+  _refreshFieldLocs(blox) {
+    const oldSpots = blox.myFieldLocs.slice();
+    blox.myFieldLocs.length = 0;
+    const fieldSpots = [];
+    this.g.field.giveMeListOfFieldPointsFor(blox.pos.x, blox.pos.y, fieldSpots);
+    for (let i = 0; i < fieldSpots.length; i++) {
+      const fieldSpot = fieldSpots[i];
+      this.g.field.addBloxToField(blox, fieldSpot);
+      const oi = oldSpots.indexOf(fieldSpot);
+      if (oi >= 0) oldSpots.splice(oi, 1);
+    }
+    while (oldSpots.length > 0) {
+      BloxField._removeFrom(oldSpots[0], blox);
+      oldSpots.shift();
+    }
+  }
+
+  _isFaceX(aBlox, hitBlox) {
+    const slip = this.g.bloxDistMin1 - 1.96;
+    return Math.abs(hitBlox.pos.y - aBlox.pos.y) < slip - 2;
+  }
+
+  _isFaceY(aBlox, hitBlox) {
+    const slip = this.g.bloxDistMin1 - 1.96;
+    return Math.abs(hitBlox.pos.x - aBlox.pos.x) < slip - 2;
+  }
+
+  _tryShoveMoverX(blox, targetX, visiting) {
+    const g = this.g;
+    targetX = this._q(targetX);
+    if (visiting.has(blox)) return true;
+    visiting.add(blox);
+    if (Math.abs(targetX - blox.pos.x) < 1 / g.BLOX_POS_PRECISION) return true;
+    if (targetX > g.RIGHT || targetX < g.LEFT) return false;
+
+    const fieldBlox = [];
+    g.field.giveMeListOfBloxInTheFieldPointsFor(targetX, blox.pos.y, fieldBlox);
+    const seen = new Set();
+    const pushes = [];
+    const consider = (hit) => {
+      if (!hit || hit === blox || seen.has(hit)) return true;
+      seen.add(hit);
+      if (!this._isFaceX(blox, hit) || !this.checkBumpX(blox, hit, targetX)) return true;
+      if (!hit.mover) return false;
+      const hitTarget = targetX <= hit.pos.x ? targetX + g.bloxDistMin1 : targetX - g.bloxDistMin1;
+      pushes.push([hit, hitTarget]);
+      return true;
+    };
+    for (let i = 0; i < fieldBlox.length; i++) {
+      if (!consider(fieldBlox[i])) return false;
+    }
+    for (let i = 0; i < g.moverBloxs.length; i++) {
+      if (!consider(g.moverBloxs[i])) return false;
+    }
+    for (let i = 0; i < pushes.length; i++) {
+      if (!this._tryShoveMoverX(pushes[i][0], pushes[i][1], visiting)) return false;
+    }
+    blox.pos.x = targetX;
+    blox.vel.x = 0;
+    blox.updateCount = g.updateCounter;
+    this._refreshFieldLocs(blox);
+    return true;
+  }
+
+  _tryShoveMoverY(blox, targetY, visiting) {
+    const g = this.g;
+    targetY = this._q(targetY);
+    if (visiting.has(blox)) return true;
+    visiting.add(blox);
+    if (Math.abs(targetY - blox.pos.y) < 1 / g.BLOX_POS_PRECISION) return true;
+    if (targetY > g.BOTTOM || targetY < g.TOP) return false;
+
+    const fieldBlox = [];
+    g.field.giveMeListOfBloxInTheFieldPointsFor(blox.pos.x, targetY, fieldBlox);
+    const seen = new Set();
+    const pushes = [];
+    const consider = (hit) => {
+      if (!hit || hit === blox || seen.has(hit)) return true;
+      seen.add(hit);
+      if (!this._isFaceY(blox, hit) || !this.checkBumpY(blox, hit, targetY)) return true;
+      if (!hit.mover) return false;
+      const hitTarget = targetY <= hit.pos.y ? targetY + g.bloxDistMin1 : targetY - g.bloxDistMin1;
+      pushes.push([hit, hitTarget]);
+      return true;
+    };
+    for (let i = 0; i < fieldBlox.length; i++) {
+      if (!consider(fieldBlox[i])) return false;
+    }
+    for (let i = 0; i < g.moverBloxs.length; i++) {
+      if (!consider(g.moverBloxs[i])) return false;
+    }
+    for (let i = 0; i < pushes.length; i++) {
+      if (!this._tryShoveMoverY(pushes[i][0], pushes[i][1], visiting)) return false;
+    }
+    blox.pos.y = targetY;
+    blox.vel.y = 0;
+    blox.updateCount = g.updateCounter;
+    this._refreshFieldLocs(blox);
+    return true;
+  }
+
+  _shoveOutFromX(aBlox, newX) {
+    const g = this.g;
+    const moveDir = Math.sign(newX - aBlox.pos.x);
+    if (moveDir === 0) return true;
+    const visiting = new Set([aBlox]);
+    const seen = new Set();
+    for (let i = 0; i < g.moverBloxs.length; i++) {
+      const hit = g.moverBloxs[i];
+      if (hit === aBlox || seen.has(hit)) continue;
+      seen.add(hit);
+      if ((hit.pos.x - aBlox.pos.x) * moveDir <= 0) continue;
+      if (!this._isFaceX(aBlox, hit) || !this.checkBumpX(aBlox, hit, newX)) continue;
+      const hitTarget = newX <= hit.pos.x ? newX + g.bloxDistMin1 : newX - g.bloxDistMin1;
+      if (!this._tryShoveMoverX(hit, hitTarget, visiting)) return false;
+    }
+    return true;
+  }
+
+  _shoveOutFromY(aBlox, newY) {
+    const g = this.g;
+    const moveDir = Math.sign(newY - aBlox.pos.y);
+    if (moveDir === 0) return true;
+    const visiting = new Set([aBlox]);
+    const seen = new Set();
+    for (let i = 0; i < g.moverBloxs.length; i++) {
+      const hit = g.moverBloxs[i];
+      if (hit === aBlox || seen.has(hit)) continue;
+      seen.add(hit);
+      if ((hit.pos.y - aBlox.pos.y) * moveDir <= 0) continue;
+      if (!this._isFaceY(aBlox, hit) || !this.checkBumpY(aBlox, hit, newY)) continue;
+      const hitTarget = newY <= hit.pos.y ? newY + g.bloxDistMin1 : newY - g.bloxDistMin1;
+      if (!this._tryShoveMoverY(hit, hitTarget, visiting)) return false;
+    }
+    return true;
+  }
+
   updateTheBlox(aBlox) {
     const g = this.g;
     aBlox.updateCount = g.updateCounter;
@@ -186,7 +327,7 @@ class BloxPhysics {
     if (Math.abs(aBlox.vel.x) > g.bloxDist) aBlox.vel.x = g.bloxDistMin1 * Math.sign(aBlox.vel.x);
     if (Math.abs(aBlox.vel.y) > g.bloxDist) aBlox.vel.y = g.bloxDistMin1 * Math.sign(aBlox.vel.y);
 
-    const q = (v) => Math.trunc(v * g.BLOX_POS_PRECISION) / g.BLOX_POS_PRECISION;
+    const q = (v) => this._q(v);
     let potNewX = q(aBlox.pos.x + aBlox.vel.x);
     let potNewY = q(aBlox.pos.y + aBlox.vel.y);
 
@@ -201,7 +342,6 @@ class BloxPhysics {
     const glueX = (hitBlox) => {
       const dify = Math.abs(hitBlox.pos.y - aBlox.pos.y);
       const rest = q(potNewX <= hitBlox.pos.x ? hitBlox.pos.x - g.bloxDistMin1 : hitBlox.pos.x + g.bloxDistMin1);
-      // Side-path lip: still a bump, but snapping to hit.pos±40 yanks X every time Y crosses 1.96.
       if (dify >= slip - 2) {
         if (Math.abs(potNewX - hitBlox.pos.x) < Math.abs(aBlox.pos.x - hitBlox.pos.x)) potNewX = q(aBlox.pos.x);
         aBlox.vel.x = 0;
@@ -210,13 +350,24 @@ class BloxPhysics {
         return;
       }
       if (!hitBlox.mover) {
-        potNewX = rest;
+        if (!this._shoveOutFromX(aBlox, rest)) {
+          potNewX = q(aBlox.pos.x);
+        } else {
+          potNewX = rest;
+        }
         aBlox.vel.x = 0;
         pinnedX = true;
         stoppedx += 1;
         return;
       }
       if (pinnedX) {
+        const moveDir = Math.sign(potNewX - aBlox.pos.x);
+        if (moveDir !== 0 && (hitBlox.pos.x - aBlox.pos.x) * moveDir > 0) {
+          const hitTarget = potNewX <= hitBlox.pos.x ? potNewX + g.bloxDistMin1 : potNewX - g.bloxDistMin1;
+          if (!this._tryShoveMoverX(hitBlox, hitTarget, new Set([aBlox]))) {
+            potNewX = q(aBlox.pos.x);
+          }
+        }
         aBlox.vel.x = 0;
         stoppedx += 1;
         return;
@@ -236,13 +387,24 @@ class BloxPhysics {
         return;
       }
       if (!hitBlox.mover) {
-        potNewY = rest;
+        if (!this._shoveOutFromY(aBlox, rest)) {
+          potNewY = q(aBlox.pos.y);
+        } else {
+          potNewY = rest;
+        }
         aBlox.vel.y = 0;
         pinnedY = true;
         stoppedy += 1;
         return;
       }
       if (pinnedY) {
+        const moveDir = Math.sign(potNewY - aBlox.pos.y);
+        if (moveDir !== 0 && (hitBlox.pos.y - aBlox.pos.y) * moveDir > 0) {
+          const hitTarget = potNewY <= hitBlox.pos.y ? potNewY + g.bloxDistMin1 : potNewY - g.bloxDistMin1;
+          if (!this._tryShoveMoverY(hitBlox, hitTarget, new Set([aBlox]))) {
+            potNewY = q(aBlox.pos.y);
+          }
+        }
         aBlox.vel.y = 0;
         stoppedy += 1;
         return;
@@ -254,9 +416,13 @@ class BloxPhysics {
 
     const resolveX = () => {
       if (potNewX > g.RIGHT) {
-        potNewX = g.RIGHT; aBlox.vel.x = 0; stoppedx += 1; aBlox.movingx = 0; pinnedX = true;
+        if (!this._shoveOutFromX(aBlox, g.RIGHT)) potNewX = q(aBlox.pos.x);
+        else potNewX = g.RIGHT;
+        aBlox.vel.x = 0; stoppedx += 1; aBlox.movingx = 0; pinnedX = true;
       } else if (potNewX < g.LEFT) {
-        potNewX = g.LEFT; aBlox.vel.x = 0; stoppedx += 1; aBlox.movingx = 0; pinnedX = true;
+        if (!this._shoveOutFromX(aBlox, g.LEFT)) potNewX = q(aBlox.pos.x);
+        else potNewX = g.LEFT;
+        aBlox.vel.x = 0; stoppedx += 1; aBlox.movingx = 0; pinnedX = true;
       } else {
         g.field.giveMeListOfBloxInTheFieldPointsFor(potNewX, aBlox.pos.y, fieldBlox);
         for (let i = 0; i < fieldBlox.length; i++) {
@@ -279,9 +445,13 @@ class BloxPhysics {
 
     const resolveY = () => {
       if (potNewY > g.BOTTOM) {
-        potNewY = g.BOTTOM; aBlox.vel.y = 0; stoppedy += 1; aBlox.movingy = 0; pinnedY = true;
+        if (!this._shoveOutFromY(aBlox, g.BOTTOM)) potNewY = q(aBlox.pos.y);
+        else potNewY = g.BOTTOM;
+        aBlox.vel.y = 0; stoppedy += 1; aBlox.movingy = 0; pinnedY = true;
       } else if (potNewY < g.TOP) {
-        potNewY = g.TOP; aBlox.vel.y = 0; stoppedy += 1; aBlox.movingy = 0; pinnedY = true;
+        if (!this._shoveOutFromY(aBlox, g.TOP)) potNewY = q(aBlox.pos.y);
+        else potNewY = g.TOP;
+        aBlox.vel.y = 0; stoppedy += 1; aBlox.movingy = 0; pinnedY = true;
       } else {
         g.field.giveMeListOfBloxInTheFieldPointsFor(aBlox.pos.x, potNewY, fieldBlox);
         for (let i = 0; i < fieldBlox.length; i++) {
@@ -302,7 +472,6 @@ class BloxPhysics {
       aBlox.pos.y = potNewY;
     };
 
-    // Keep both axis orders. Larger tilt first so slides along walls/corners stay smooth.
     if (Math.abs(g.downx) > Math.abs(g.downy)) {
       resolveX();
       resolveY();
@@ -321,22 +490,7 @@ class BloxPhysics {
     g.anyMovingx += aBlox.movingx;
     g.anyMovingy += aBlox.movingy;
 
-    const oldSpots = aBlox.myFieldLocs.slice();
-    aBlox.myFieldLocs.length = 0;
-    const fieldSpots = [];
-    g.field.giveMeListOfFieldPointsFor(aBlox.pos.x, aBlox.pos.y, fieldSpots);
-
-    for (let i = 0; i < fieldSpots.length; i++) {
-      const fieldSpot = fieldSpots[i];
-      g.field.addBloxToField(aBlox, fieldSpot);
-      const oi = oldSpots.indexOf(fieldSpot);
-      if (oi >= 0) oldSpots.splice(oi, 1);
-    }
-
-    while (oldSpots.length > 0) {
-      BloxField._removeFrom(oldSpots[0], aBlox);
-      oldSpots.shift();
-    }
+    this._refreshFieldLocs(aBlox);
   }
 
   checkBumpX(aBlox, hitBlox, potNewX) {
