@@ -306,6 +306,72 @@ class BloxPhysics {
     return true;
   }
 
+  _applyPlanX(plan) {
+    plan.forEach((x, b) => {
+      if (b.pos.x !== x) {
+        b.pos.x = x;
+        this._refreshFieldLocs(b);
+      }
+    });
+  }
+
+  _applyPlanY(plan) {
+    plan.forEach((y, b) => {
+      if (b.pos.y !== y) {
+        b.pos.y = y;
+        this._refreshFieldLocs(b);
+      }
+    });
+  }
+
+  _tryPushMoverX(hit, keepX) {
+    const g = this.g;
+    const hitTarget = this._q(keepX <= hit.pos.x ? keepX + g.bloxDistMin1 : keepX - g.bloxDistMin1);
+    const plan = new Map();
+    this._cornering = true;
+    const ok = this._planPushX(hit, hitTarget, new Set(), plan);
+    this._cornering = false;
+    if (!ok) return false;
+    this._applyPlanX(plan);
+    return true;
+  }
+
+  _tryPushMoverY(hit, keepY) {
+    const g = this.g;
+    const hitTarget = this._q(keepY <= hit.pos.y ? keepY + g.bloxDistMin1 : keepY - g.bloxDistMin1);
+    const plan = new Map();
+    this._cornering = true;
+    const ok = this._planPushY(hit, hitTarget, new Set(), plan);
+    this._cornering = false;
+    if (!ok) return false;
+    this._applyPlanY(plan);
+    return true;
+  }
+
+  _staticHitX(blox, x) {
+    const g = this.g;
+    const list = [];
+    g.field.giveMeListOfBloxInTheFieldPointsFor(x, blox.pos.y, list);
+    for (let i = 0; i < list.length; i++) {
+      const hit = list[i];
+      if (!hit || hit === blox || hit.mover) continue;
+      if (this._bumpXAt(x, blox.pos.y, hit, hit.pos.x, hit.pos.y, blox.pos.x, blox.pos.y)) return hit;
+    }
+    return null;
+  }
+
+  _staticHitY(blox, y) {
+    const g = this.g;
+    const list = [];
+    g.field.giveMeListOfBloxInTheFieldPointsFor(blox.pos.x, y, list);
+    for (let i = 0; i < list.length; i++) {
+      const hit = list[i];
+      if (!hit || hit === blox || hit.mover) continue;
+      if (this._bumpYAt(blox.pos.x, y, hit, hit.pos.x, hit.pos.y, blox.pos.x, blox.pos.y)) return hit;
+    }
+    return null;
+  }
+
   _finishCorner(aBlox, oldX, oldY) {
     if (this._cornering) return;
     const g = this.g;
@@ -340,26 +406,12 @@ class BloxPhysics {
       const rest = this._q(oldY <= wall.pos.y ? wall.pos.y - dist : wall.pos.y + dist);
       const ok = this._planPushY(aBlox, rest, new Set(), plan);
       this._cornering = false;
-      if (ok) {
-        plan.forEach((y, b) => {
-          if (b.pos.y !== y) {
-            b.pos.y = y;
-            this._refreshFieldLocs(b);
-          }
-        });
-      }
+      if (ok) this._applyPlanY(plan);
     } else {
       const rest = this._q(oldX <= wall.pos.x ? wall.pos.x - dist : wall.pos.x + dist);
       const ok = this._planPushX(aBlox, rest, new Set(), plan);
       this._cornering = false;
-      if (ok) {
-        plan.forEach((x, b) => {
-          if (b.pos.x !== x) {
-            b.pos.x = x;
-            this._refreshFieldLocs(b);
-          }
-        });
-      }
+      if (ok) this._applyPlanX(plan);
     }
   }
 
@@ -400,17 +452,19 @@ class BloxPhysics {
           if (this.checkBumpX(aBlox, hitBlox, potNewX)) {
             if (hitBlox.mover && hitBlox.updateCount < g.updateCounter) {
               this.updateTheBlox(hitBlox);
-              if (this.checkBumpX(aBlox, hitBlox, potNewX)) {
-                if (aBlox.pos.x <= hitBlox.pos.x) potNewX = hitBlox.pos.x - g.bloxDistMin1;
-                else potNewX = hitBlox.pos.x + g.bloxDistMin1;
+            }
+            if (this.checkBumpX(aBlox, hitBlox, potNewX)) {
+              if (hitBlox.mover && this._tryPushMoverX(hitBlox, potNewX)) continue;
+              const snap = aBlox.pos.x <= hitBlox.pos.x ? hitBlox.pos.x - g.bloxDistMin1 : hitBlox.pos.x + g.bloxDistMin1;
+              if (hitBlox.mover && this._staticHitX(aBlox, snap)) {
+                potNewX = aBlox.pos.x;
+                aBlox.vel.x = 0;
+                stoppedx += 1;
+              } else {
+                potNewX = snap;
                 aBlox.vel.x = hitBlox.vel.x;
                 if (aBlox.vel.x === 0) stoppedx += 1;
               }
-            } else if (this.checkBumpX(aBlox, hitBlox, potNewX)) {
-              if (aBlox.pos.x <= hitBlox.pos.x) potNewX = hitBlox.pos.x - g.bloxDistMin1;
-              else potNewX = hitBlox.pos.x + g.bloxDistMin1;
-              aBlox.vel.x = hitBlox.vel.x;
-              if (aBlox.vel.x === 0) stoppedx += 1;
             }
           }
         }
@@ -433,17 +487,19 @@ class BloxPhysics {
           if (this.checkBumpY(aBlox, hitBlox, potNewY)) {
             if (hitBlox.mover && hitBlox.updateCount < g.updateCounter) {
               this.updateTheBlox(hitBlox);
-              if (this.checkBumpY(aBlox, hitBlox, potNewY)) {
-                if (aBlox.pos.y <= hitBlox.pos.y) potNewY = hitBlox.pos.y - g.bloxDistMin1;
-                else potNewY = hitBlox.pos.y + g.bloxDistMin1;
+            }
+            if (this.checkBumpY(aBlox, hitBlox, potNewY)) {
+              if (hitBlox.mover && this._tryPushMoverY(hitBlox, potNewY)) continue;
+              const snap = aBlox.pos.y <= hitBlox.pos.y ? hitBlox.pos.y - g.bloxDistMin1 : hitBlox.pos.y + g.bloxDistMin1;
+              if (hitBlox.mover && this._staticHitY(aBlox, snap)) {
+                potNewY = aBlox.pos.y;
+                aBlox.vel.y = 0;
+                stoppedy += 1;
+              } else {
+                potNewY = snap;
                 aBlox.vel.y = hitBlox.vel.y;
                 if (aBlox.vel.y === 0) stoppedy += 1;
               }
-            } else if (this.checkBumpY(aBlox, hitBlox, potNewY)) {
-              if (aBlox.pos.y <= hitBlox.pos.y) potNewY = hitBlox.pos.y - g.bloxDistMin1;
-              else potNewY = hitBlox.pos.y + g.bloxDistMin1;
-              aBlox.vel.y = hitBlox.vel.y;
-              if (aBlox.vel.y === 0) stoppedy += 1;
             }
           }
         }
