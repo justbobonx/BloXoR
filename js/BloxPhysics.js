@@ -200,6 +200,17 @@ class BloxPhysics {
     return t === BloxType.OW_L || t === BloxType.OW_R || t === BloxType.OW_U || t === BloxType.OW_D;
   }
 
+  _oneWayBlocksMove(hit, fromX, fromY, toX, toY) {
+    const t = hit.bloxType;
+    const hx = hit.pos.x;
+    const hy = hit.pos.y;
+    if (t === BloxType.OW_R) return fromX >= hx && toX < hx;
+    if (t === BloxType.OW_L) return fromX <= hx && toX > hx;
+    if (t === BloxType.OW_D) return fromY >= hy && toY < hy;
+    if (t === BloxType.OW_U) return fromY <= hy && toY > hy;
+    return false;
+  }
+
   _bumpXAt(ax, ay, hit, hx, hy, fromX, fromY) {
     const g = this.g;
     const dist = g.bloxDist;
@@ -242,6 +253,15 @@ class BloxPhysics {
     return false;
   }
 
+  _collectPlanHits(x, y, extraX, extraY, into) {
+    const g = this.g;
+    g.field.giveMeListOfBloxInTheFieldPointsFor(x, y, into);
+    if (extraX === x && extraY === y) return;
+    const extra = [];
+    g.field.giveMeListOfBloxInTheFieldPointsFor(extraX, extraY, extra);
+    for (let i = 0; i < extra.length; i++) into.push(extra[i]);
+  }
+
   _planPushX(blox, targetX, visiting, plan) {
     const g = this.g;
     const dist = g.bloxDist;
@@ -258,6 +278,7 @@ class BloxPhysics {
 
     const consider = (hit) => {
       if (!hit || hit === blox) return true;
+      if (this._isOneWay(hit) && this._oneWayBlocksMove(hit, blox.pos.x, blox.pos.y, targetX, blox.pos.y)) return false;
       const hitX = plan.has(hit) ? plan.get(hit) : hit.pos.x;
       if (!this._bumpXAt(targetX, blox.pos.y, hit, hitX, hit.pos.y, blox.pos.x, blox.pos.y)) return true;
       if (!hit.mover) return false;
@@ -266,7 +287,7 @@ class BloxPhysics {
     };
 
     const fieldBlox = [];
-    g.field.giveMeListOfBloxInTheFieldPointsFor(targetX, blox.pos.y, fieldBlox);
+    this._collectPlanHits(targetX, blox.pos.y, blox.pos.x, blox.pos.y, fieldBlox);
     for (let i = 0; i < fieldBlox.length; i++) {
       if (!consider(fieldBlox[i])) return false;
     }
@@ -292,6 +313,7 @@ class BloxPhysics {
 
     const consider = (hit) => {
       if (!hit || hit === blox) return true;
+      if (this._isOneWay(hit) && this._oneWayBlocksMove(hit, blox.pos.x, blox.pos.y, blox.pos.x, targetY)) return false;
       const hitY = plan.has(hit) ? plan.get(hit) : hit.pos.y;
       if (!this._bumpYAt(blox.pos.x, targetY, hit, hit.pos.x, hitY, blox.pos.x, blox.pos.y)) return true;
       if (!hit.mover) return false;
@@ -300,7 +322,7 @@ class BloxPhysics {
     };
 
     const fieldBlox = [];
-    g.field.giveMeListOfBloxInTheFieldPointsFor(blox.pos.x, targetY, fieldBlox);
+    this._collectPlanHits(blox.pos.x, targetY, blox.pos.x, blox.pos.y, fieldBlox);
     for (let i = 0; i < fieldBlox.length; i++) {
       if (!consider(fieldBlox[i])) return false;
     }
@@ -359,6 +381,7 @@ class BloxPhysics {
       const hit = list[i];
       if (!hit || hit === blox || hit.mover) continue;
       if (this._bumpXAt(x, blox.pos.y, hit, hit.pos.x, hit.pos.y, blox.pos.x, blox.pos.y)) return hit;
+      if (this._isOneWay(hit) && this._oneWayBlocksMove(hit, blox.pos.x, blox.pos.y, x, blox.pos.y)) return hit;
     }
     return null;
   }
@@ -370,6 +393,7 @@ class BloxPhysics {
       const hit = list[i];
       if (!hit || hit === blox || hit.mover) continue;
       if (this._bumpYAt(blox.pos.x, y, hit, hit.pos.x, hit.pos.y, blox.pos.x, blox.pos.y)) return hit;
+      if (this._isOneWay(hit) && this._oneWayBlocksMove(hit, blox.pos.x, blox.pos.y, blox.pos.x, y)) return hit;
     }
     return null;
   }
