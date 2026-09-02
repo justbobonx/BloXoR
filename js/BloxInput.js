@@ -30,6 +30,8 @@ class BloxInput {
     this.iaDirHeld = '';
     this.wakeLock = null;
     this.wakeBusy = false;
+    this.wakeGraceUntil = 0;
+    this.WAKE_GRACE_MS = 60000;
 
     this.tiltAttached = false;
     this.tiltDenied = false;
@@ -153,9 +155,22 @@ class BloxInput {
 
   playingForWake() {
     const g = this.g;
-    if (g.ui.menuOpen()) return false;
     if (document.visibilityState === 'hidden') return false;
+    if (g.ui.visible('pauseScreen')) return true;
+    if (this.wakeGraceUntil && Date.now() < this.wakeGraceUntil) return true;
+    if (g.ui.menuOpen()) return false;
     return g.gameState === GameState.InPlay || g.gameState === GameState.WaitToStartNewLevel;
+  }
+
+  startWakeGrace() {
+    this.wakeGraceUntil = Date.now() + this.WAKE_GRACE_MS;
+    this.syncWakeLock();
+  }
+
+  clearWakeGrace() {
+    if (!this.wakeGraceUntil) return;
+    this.wakeGraceUntil = 0;
+    this.syncWakeLock();
   }
 
   syncWakeLock() {
@@ -580,14 +595,7 @@ class BloxInput {
     const y = p.y;
     const world = this.toWorld(ev, canvas);
 
-    if (g.gameState === GameState.LevelBeat) {
-      if (phase === 'down') {
-        g.gameState = GameState.NoDraw;
-        g.ui.closeScore();
-        g.ui.showLevelSelect();
-      }
-      return;
-    }
+    if (g.gameState === GameState.LevelBeat) return;
 
     if (phase === 'down') {
       this.startHold(world);
