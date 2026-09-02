@@ -260,6 +260,13 @@ button.ui-focus,
   object-fit: contain;
 }
 
+.ls-mark.open {
+  width: 11px;
+  height: 11px;
+  flex: 0 0 11px;
+  margin: 0 5.5px;
+}
+
 .ls-mark.empty {
   visibility: hidden;
 }
