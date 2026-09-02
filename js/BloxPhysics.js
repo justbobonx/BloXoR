@@ -247,7 +247,7 @@ class BloxPhysics {
     visiting.add(blox);
     if (targetX > g.RIGHT || targetX < g.LEFT) return false;
 
-    if (blox.updateCount < g.updateCounter) this.updateTheBlox(blox);
+    if (!this._cornering && blox.updateCount < g.updateCounter) this.updateTheBlox(blox);
 
     const curX = plan.has(blox) ? plan.get(blox) : blox.pos.x;
     plan.set(blox, targetX);
@@ -280,7 +280,7 @@ class BloxPhysics {
     visiting.add(blox);
     if (targetY > g.BOTTOM || targetY < g.TOP) return false;
 
-    if (blox.updateCount < g.updateCounter) this.updateTheBlox(blox);
+    if (!this._cornering && blox.updateCount < g.updateCounter) this.updateTheBlox(blox);
 
     const curY = plan.has(blox) ? plan.get(blox) : blox.pos.y;
     plan.set(blox, targetY);
@@ -309,7 +309,8 @@ class BloxPhysics {
   _finishCorner(aBlox, oldX, oldY) {
     if (this._cornering) return;
     const g = this.g;
-    const slip = g.bloxDistMin1 - this.CORNER_ROUND;
+    const dist = g.bloxDistMin1;
+    const slip = dist - this.CORNER_ROUND;
 
     const hits = [];
     g.field.giveMeListOfBloxInTheFieldPointsFor(aBlox.pos.x, aBlox.pos.y, hits);
@@ -322,23 +323,22 @@ class BloxPhysics {
       if (!hit || hit === aBlox || hit.mover || this._isOneWay(hit)) continue;
       const dx = Math.abs(aBlox.pos.x - hit.pos.x);
       const dy = Math.abs(aBlox.pos.y - hit.pos.y);
-      if (dx < g.bloxDistMin1 && dy >= slip && dy < g.bloxDistMin1) {
-        const need = g.bloxDistMin1 - dy;
+      if (dx < slip && dy >= slip && dy < dist) {
+        const need = dist - dy;
         if (need < best) { best = need; wall = hit; gapAxis = 'y'; }
       }
-      if (dy < g.bloxDistMin1 && dx >= slip && dx < g.bloxDistMin1) {
-        const need = g.bloxDistMin1 - dx;
+      if (dy < slip && dx >= slip && dx < dist) {
+        const need = dist - dx;
         if (need < best) { best = need; wall = hit; gapAxis = 'x'; }
       }
     }
-    if (!wall || best > 2.05) return;
+    if (!wall) return;
 
     this._cornering = true;
     const plan = new Map();
-    let ok = false;
     if (gapAxis === 'y') {
-      const rest = this._q(aBlox.pos.y <= wall.pos.y ? wall.pos.y - g.bloxDistMin1 : wall.pos.y + g.bloxDistMin1);
-      ok = this._planPushY(aBlox, rest, new Set(), plan);
+      const rest = this._q(oldY <= wall.pos.y ? wall.pos.y - dist : wall.pos.y + dist);
+      const ok = this._planPushY(aBlox, rest, new Set(), plan);
       this._cornering = false;
       if (ok) {
         plan.forEach((y, b) => {
@@ -347,14 +347,10 @@ class BloxPhysics {
             this._refreshFieldLocs(b);
           }
         });
-      } else {
-        aBlox.pos.x = oldX;
-        aBlox.vel.x = 0;
-        aBlox.movingx = 0;
       }
     } else {
-      const rest = this._q(aBlox.pos.x <= wall.pos.x ? wall.pos.x - g.bloxDistMin1 : wall.pos.x + g.bloxDistMin1);
-      ok = this._planPushX(aBlox, rest, new Set(), plan);
+      const rest = this._q(oldX <= wall.pos.x ? wall.pos.x - dist : wall.pos.x + dist);
+      const ok = this._planPushX(aBlox, rest, new Set(), plan);
       this._cornering = false;
       if (ok) {
         plan.forEach((x, b) => {
@@ -363,10 +359,6 @@ class BloxPhysics {
             this._refreshFieldLocs(b);
           }
         });
-      } else {
-        aBlox.pos.y = oldY;
-        aBlox.vel.y = 0;
-        aBlox.movingy = 0;
       }
     }
   }
