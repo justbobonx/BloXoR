@@ -314,45 +314,28 @@ class BloxPhysics {
     g.field.giveMeListOfBloxInTheFieldPointsFor(aBlox.pos.x, aBlox.pos.y, hits);
 
     let wall = null;
-    let snapAxis = null;
+    let gapAxis = null;
+    let best = 99;
     for (let i = 0; i < hits.length; i++) {
       const hit = hits[i];
       if (!hit || hit === aBlox || hit.mover || this._isOneWay(hit)) continue;
       const dx = Math.abs(aBlox.pos.x - hit.pos.x);
       const dy = Math.abs(aBlox.pos.y - hit.pos.y);
       if (dx < g.bloxDistMin1 && dy >= slip && dy < g.bloxDistMin1) {
-        wall = hit;
-        snapAxis = 'x';
-        break;
+        const need = g.bloxDistMin1 - dy;
+        if (need < best) { best = need; wall = hit; gapAxis = 'y'; }
       }
       if (dy < g.bloxDistMin1 && dx >= slip && dx < g.bloxDistMin1) {
-        wall = hit;
-        snapAxis = 'y';
-        break;
+        const need = g.bloxDistMin1 - dx;
+        if (need < best) { best = need; wall = hit; gapAxis = 'x'; }
       }
     }
-    if (!wall) return;
+    if (!wall || best > 2.05) return;
 
     this._cornering = true;
     const plan = new Map();
     let ok = false;
-    if (snapAxis === 'x') {
-      const rest = this._q(aBlox.pos.x <= wall.pos.x ? wall.pos.x - g.bloxDistMin1 : wall.pos.x + g.bloxDistMin1);
-      ok = this._planPushX(aBlox, rest, new Set(), plan);
-      this._cornering = false;
-      if (ok) {
-        plan.forEach((x, b) => {
-          if (b.pos.x !== x) {
-            b.pos.x = x;
-            this._refreshFieldLocs(b);
-          }
-        });
-      } else {
-        aBlox.pos.y = oldY;
-        aBlox.vel.y = 0;
-        aBlox.movingy = 0;
-      }
-    } else {
+    if (gapAxis === 'y') {
       const rest = this._q(aBlox.pos.y <= wall.pos.y ? wall.pos.y - g.bloxDistMin1 : wall.pos.y + g.bloxDistMin1);
       ok = this._planPushY(aBlox, rest, new Set(), plan);
       this._cornering = false;
@@ -367,6 +350,22 @@ class BloxPhysics {
         aBlox.pos.x = oldX;
         aBlox.vel.x = 0;
         aBlox.movingx = 0;
+      }
+    } else {
+      const rest = this._q(aBlox.pos.x <= wall.pos.x ? wall.pos.x - g.bloxDistMin1 : wall.pos.x + g.bloxDistMin1);
+      ok = this._planPushX(aBlox, rest, new Set(), plan);
+      this._cornering = false;
+      if (ok) {
+        plan.forEach((x, b) => {
+          if (b.pos.x !== x) {
+            b.pos.x = x;
+            this._refreshFieldLocs(b);
+          }
+        });
+      } else {
+        aBlox.pos.y = oldY;
+        aBlox.vel.y = 0;
+        aBlox.movingy = 0;
       }
     }
   }
