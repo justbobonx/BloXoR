@@ -644,9 +644,9 @@ class BloXorUI {
   showScore(cur, rec) {
     document.getElementById('sc_title').textContent = rec && rec.title ? rec.title : 'Level done';
     const had = !!(rec && rec.hadPrev);
-    this.fillStat('sc_score', 'Score', this.formatScore(cur.score), !!(rec && rec.scoreBest), had && rec.scoreBest ? this.formatScore(rec.prevScore) : null);
-    this.fillStat('sc_time', 'Time', this.formatClock(cur.seconds), !!(rec && rec.timeBest), had && rec.timeBest ? this.formatClock(rec.prevSeconds) : null);
-    this.fillStat('sc_moves', 'Tilts', String(cur.moves), !!(rec && rec.movesBest), had && rec.movesBest ? String(rec.prevMoves) : null);
+    this.fillStat('sc_score', 'Score', this.formatScore(cur.score), had && rec.scoreBest, had && rec.scoreBest ? this.formatScore(rec.prevScore) : null);
+    this.fillStat('sc_time', 'Time', this.formatClock(cur.seconds), had && rec.timeBest, had && rec.timeBest ? this.formatClock(rec.prevSeconds) : null);
+    this.fillStat('sc_moves', 'Tilts', String(cur.moves), had && rec.movesBest, had && rec.movesBest ? String(rec.prevMoves) : null);
     document.getElementById('scoreView').classList.remove('hidden');
     this.focusIndex = 0; this.collectFocus(); this.g.input.absorbButtons();
   }
