@@ -79,3 +79,58 @@ One `Audio` per `assets/audio/*.ogg`. First pointer/key wakes the browser. Mute 
 `index.html` VERSION → Coord → GfxState → BitmapManager → Sprite → SoundManager → Blox → LevelData → GameSave → BloxField → BloxPhysics → BloxInput → PuzzleLoader → LevelIndex → GameView → BloXor → main
 
 Keep that order. New files go in the `document.write` list in `index.html` with `?v=` + VERSION.
+
+## Previous Change Log
+
+Condensed from the old git history. Version bumps, reverts, merges, and empty commits omitted.
+
+- First-pass HTML5 port, then wired CSS, puzzles, and the JS modules (LevelData, GameSave, LevelIndex, Sprite, Blox, BitmapManager, BloxField, PuzzleLoader, GameView, BloxInput, BloxPhysics, BloXor + UI).
+- Moved puzzles to `assets/data`; added images, thumbs, help HTML; ignored Thumbs.db.
+- Softened keyboard/mouse debug tilt for slight-nudge play.
+- Letterbox the 3:2 board so left/right walls stay on screen.
+- Level preview thumbs, HTML descriptions, locked-level `???` and unlock gate.
+- Packed movers stay in sync by copying vel on snap.
+- Recheck `checkBumpY` on the Y else-branch the same way as X.
+- Ignore sub-precision cell offsets so dust does not occupy two cells.
+- Quantize snaps; only count a stop when vel is 0.
+- Gamepad stick tilt using the Steam `joyLev`/`joyPow` curve; poll every tick including wait-to-start.
+- Soften stick tilt; keys/stick menu focus nav; Enter pauses in play; focus ring.
+- Device tilt in `BloxInput` via `devicemotion`; prefer gravity motion over orientation.
+- Fullscreen from title PLAY; resize on fullscreen change.
+- Draw the 480×320 world through the canvas transform; do not scale physics. Pointer hits map through that transform.
+- Gamepad B opens pause. Level list only autoscrolls on key/stick focus moves.
+- Title art on the start screen.
+- GML-style bomb interact: rotating hilite, A/Space enters select, stick/keys step to nearest in that half-plane.
+- Wait-to-start goes through `startFromWait`; consume start-A so it cannot open bomb select.
+- Latch / absorb held face buttons across play, pause, and resume.
+- Blank tap opens pause. Tilt axis signs: landscape flip Y only, portrait flip X only.
+- Wake lock while playing; long-press empty space to pause.
+- Dropped orientation lock. Tall viewports CSS-rotate the stage onto the wide axis; touch and tilt map through that rotate.
+- Single title-gate path into fullscreen + wide-axis stage. Gate lives inside the stage and only shows when a portrait flash is possible.
+- One `VERSION` string busts CSS and all scripts.
+- Tilt constants moved into `BloxInput`.
+- `SoundManager` for ogg SFX. Silence audio on lost focus / pause without flipping mute. `pagehide` runs even if `visibilityState` is still visible. Save on lost focus.
+- Do not leave wait-to-start until tilt has real samples.
+- Separate tilt vs stick friction so held leans keep accelerating.
+- Sandwich jitter: static wall pin wins over mover glue. Do not face-snap glue on side-path wiggle grazes.
+- Title gate also covers first-load portrait flash.
+- Level select one-line stats; mute moved to pause. Later: two-line stats, O/X marks, compact pause and detail stats, pause title is the level name.
+- Win: OXO copies fly toward screen center keeping spacing; score panel delayed; yellow bests.
+- Skip tilt calibrate overlay for keyboard and gamepad; start those levels immediately.
+- Hide key tilt behind `?keysOn=1`; drop drag-to-tilt.
+- Play HUD: comma scores, TILTS/TIME labels; dismiss pause on outside tap.
+- Title is Play only (no Continue). Center the highlighted level in the select list. Tagline under art, contact under Play.
+- Zero stick tilt when keys are off.
+- Level-detail stats: centered columns, first-beat date only.
+- HUD went from hard shadow + long-press hint, to chips (padding/opacity passes), then split TILTS and TIME chips.
+- Face-snap wall shove pushes the mover chain or refuses the snap.
+- Wake lock stays on during pause; 60s grace after level complete; clear grace on score OK.
+- Open unbeaten levels use the half-size generic block icon.
+- Corner finish: snap only the gap axis by the lip amount, and only on embed+lip; do not revert the other axis. Corner round is a const.
+- Do not snap-and-zero against an already-ticked mover (this was tried, then the opposite kept: already-ticked movers snap again).
+- Still-hitting sets vel to `hit.vel` instead of zero.
+- One-way bump tests use start pos, not `potNew`. Snap face is picked from pre-move pos, not `potNew`. One-ways block reverse plan snaps from the gate cell.
+- Sandwich: shove the mover pack to rest before snapping self.
+- Dropped `bloxDistMin1`; lattice constants live on `BloXor`.
+- First-beat score rows stay white (no record highlight).
+- Stripped leftover level/data files; removed the blank BOM line in `PuzzleIndex.txt`.
