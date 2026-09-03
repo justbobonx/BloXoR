@@ -1,5 +1,4 @@
-﻿
-Hello BloXoR	To complete a level, you must line up the <img src="blx-O.png" width=18 height=18>, <img src="blx-X.png" width=18 height=18>, and <img src="blx-O.png" width=18 height=18> Blox by titling the device and sliding the Blox around.
+﻿Hello BloXoR	To complete a level, you must line up the <img src="blx-O.png" width=18 height=18>, <img src="blx-X.png" width=18 height=18>, and <img src="blx-O.png" width=18 height=18> Blox by titling the device and sliding the Blox around.
 Step Two	With a little effort, you can rearrange Blox.  Remember, you have to line up the <img src="blx-O.png" width=18 height=18><img src="blx-X.png" width=18 height=18><img src="blx-O.png" width=18 height=18> Blox in that order.  (They can be lined up horizontally or vertically.)
 A Twist	Bring up the <b>Pause Menu</b> at any time by tapping the Back or Menu buttons.  From the pause menu, you can Resume or Restart the current level, or Exit back to the Main Menu.
 Obstacles	Too easy? We'll throw in some <img src="blx-generic-movable.png" width=18 height=18> Blox. They don't do anything.  They just slide around and generally get in your way.
