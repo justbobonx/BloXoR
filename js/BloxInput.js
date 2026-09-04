@@ -7,8 +7,8 @@ class BloxInput {
     this.dragOrigin = null;
     this.holdTimer = 0;
     this.holdWorld = null;
-    this.FLAT_SPAN = 0.03;
-    this.FLAT_START = 0.01;
+    this.FLAT_SPAN = 0.04;
+    this.FLAT_START = 0.02;
     this.TILT_GAIN = 1.4;
     this.LONG_PRESS_MS = 550;
     this.KEY_TILT = 0.12;
