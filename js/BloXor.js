@@ -338,7 +338,7 @@ class BloXor {
     if (this.ui.gateOpen()) return;
     if (this.ui.detailOpen()) { this.ui.closeDetail(); this.input.absorbButtons(); return; }
     if (this.waitingOnAct) { this.cancelInteract(); this.input.absorbButtons(); return; }
-    if (this.ui.visible('pauseScreen')) { this.resumePlay(); return; }
+    if (this.ui.visible('pauseScreen')) { this.(); return; }
     if (this.gameState === GameState.InPlay || this.gameState === GameState.WaitToStartNewLevel) {
       this.pauseGameState = this.gameState;
       this.gameState = GameState.NoDraw;
@@ -349,8 +349,13 @@ class BloXor {
     this.input.absorbButtons();
     this.enterPlayChrome().then(() => {
       this.ui.hideMenus();
-      this.gameState = this.pauseGameState || GameState.InPlay;
-      if (this.gameState === GameState.NoDraw) this.gameState = GameState.InPlay;
+      let next = this.pauseGameState || GameState.InPlay;
+      if (next === GameState.NoDraw) next = GameState.InPlay;
+      if (this.input.usingTiltControl() &&
+          (next === GameState.InPlay || next === GameState.WaitToStartNewLevel)) {
+        next = GameState.WaitToStartNewLevel;
+      }
+      this.gameState = next;
       this.pauseGameState = null;
       this.input.absorbButtons();
     });
