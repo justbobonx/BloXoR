@@ -338,7 +338,7 @@ class BloXor {
     if (this.ui.gateOpen()) return;
     if (this.ui.detailOpen()) { this.ui.closeDetail(); this.input.absorbButtons(); return; }
     if (this.waitingOnAct) { this.cancelInteract(); this.input.absorbButtons(); return; }
-    if (this.ui.visible('pauseScreen')) { this.(); return; }
+    if (this.ui.visible('pauseScreen')) { this.resumePlay(); return; }
     if (this.gameState === GameState.InPlay || this.gameState === GameState.WaitToStartNewLevel) {
       this.pauseGameState = this.gameState;
       this.gameState = GameState.NoDraw;
