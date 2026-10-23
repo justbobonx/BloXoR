@@ -12,7 +12,6 @@ class GameSave {
       lines.push(g.levelData[i].getDataString());
     }
     const data = {
-      appVersion: (typeof VERSION !== 'undefined' ? VERSION : ''),
       firstTime: g.firstTime,
       curLevel: g.curPuzzleInd,
       soundMuted: g.soundManager ? g.soundManager.muted() : false,

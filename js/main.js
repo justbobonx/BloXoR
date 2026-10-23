@@ -1,4 +1,4 @@
-console.log('BloXoR', VERSION);
+console.log('BloXoR');
 
 const canvas = document.getElementById('gameCanvas');
 const game = new BloXor(canvas);

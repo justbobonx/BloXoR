@@ -9,6 +9,7 @@
   <title>BloXoR</title>
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="assets/images/icon.png" type="image/png">
+  <link rel="stylesheet" href="css/style.css?v=0.3.59">
   <style>
     html, body { margin: 0; background: #000; height: 100%; overflow: hidden; }
     #orientGate {
@@ -29,8 +30,6 @@
     #orientGate.hidden { display: none !important; }
   </style>
   <script>
-    window.VERSION = '0.3.59';
-    document.write('<link rel="stylesheet" href="css/style.css?v=' + window.VERSION + '">');
     if (window.innerHeight > window.innerWidth) {
       document.documentElement.classList.add('stage-swap');
     }
@@ -53,7 +52,7 @@
         <button id="newGameButton">PLAY</button>
       </div>
       <a id="startEmail" href="https://x.com/just_bob" target="_blank" rel="noopener noreferrer">just_bob@X.com</a>
-      <div id="startVersion"></div>
+      <div id="startVersion">v0.3.59</div>
     </div>
 
     <div id="playHud" class="hidden"></div>
@@ -118,28 +117,27 @@
     </div>
   </div>
 
-  <script>
-    document.getElementById('startVersion').textContent = 'v' + window.VERSION;
-    [
-      'js/Coord.js',
-      'js/GfxState.js',
-      'js/BitmapManager.js',
-      'js/Sprite.js',
-      'js/SoundManager.js',
-      'js/Blox.js',
-      'js/LevelData.js',
-      'js/GameSave.js',
-      'js/BloxField.js',
-      'js/BloxPhysics.js',
-      'js/BloxInput.js',
-      'js/PuzzleLoader.js',
-      'js/LevelIndex.js',
-      'js/GameView.js',
-      'js/BloXor.js',
-      'js/main.js'
-    ].forEach(function (src) {
-      document.write('<script src="' + src + '?v=' + window.VERSION + '"><\/script>');
-    });
-  </script>
+  <script src="js/Coord.js?v=0.3.59"></script>
+  <script src="js/GfxState.js?v=0.3.59"></script>
+  <script src="js/BitmapManager.js?v=0.3.59"></script>
+  <script src="js/Sprite.js?v=0.3.59"></script>
+  <script src="js/SoundManager.js?v=0.3.59"></script>
+  <script src="js/Blox.js?v=0.3.59"></script>
+  <script src="js/LevelData.js?v=0.3.59"></script>
+  <script src="js/GameSave.js?v=0.3.59"></script>
+  <script src="js/BloxField.js?v=0.3.59"></script>
+  <script src="js/BloxPhysics.js?v=0.3.59"></script>
+  <script src="js/BloxInput.js?v=0.3.59"></script>
+  <script src="js/PuzzleLoader.js?v=0.3.59"></script>
+  <script src="js/LevelIndex.js?v=0.3.59"></script>
+  <script src="js/GameView.js?v=0.3.59"></script>
+  <script src="js/BloXor.js?v=0.3.59"></script>
+  <script src="js/main.js?v=0.3.59"></script>
+
+  <script data-goatcounter="https://justbobonx.goatcounter.com/count"
+      async
+      src="https://gc.zgo.at/count.v5.js"
+      crossorigin="anonymous"
+      integrity="sha384-atnOLvQb9t+jTSipvd75X2yginT4PjVbqDdlJAmxMm+wYElFmeR6EmLP5bYeoRVQ"></script>
 </body>
 </html>
